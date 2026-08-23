@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Reproducible glibc builds with the same pinned Debian image as image_ffmpeg.
+# Reproducible glibc 2.31 builds using GCC 12 on Debian bullseye. zxing-cpp 3.x
+# needs newer C++20 parsing than bullseye's distro GCC 10, but changing the
+# compiler does not need to raise the shipped glibc baseline.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -10,16 +12,24 @@ case "$target" in
 esac
 command -v docker >/dev/null || { echo 'docker is required' >&2; exit 1; }
 
-docker run --rm --platform linux/amd64 \
+if [[ "$target" == linux-x64 ]]; then
+  platform=linux/amd64
+  image='gcc@sha256:5c3421e670da08036f641a073da0191f82334ba6f102558dd2d73ded72318d2b'
+else
+  platform=linux/arm64
+  image='gcc@sha256:877cfec017e7d18ddaf3376a2a575bd9c065ee34e6c20b8913938360992a0040'
+fi
+
+docker run --rm --platform "$platform" \
   -v "$root:/workspace" \
   -w /workspace \
-  debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081829363eed57706634f7dc26e8c6712934303d57a \
+  "$image" \
   bash -lc '
     set -euo pipefail
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
     apt-get install -y --no-install-recommends \
-      build-essential ca-certificates cmake git python3 \
-      gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+      ca-certificates cmake git make python3 binutils
+    g++ -dumpfullversion | grep "^12\."
     ZXD_BUILD_JOBS='"${ZXD_BUILD_JOBS:-4}"' tool/build_native_artifact.sh '"$target"'
   '

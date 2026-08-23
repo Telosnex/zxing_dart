@@ -6,7 +6,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="${1:-}"
-profile_version=3
+profile_version=4
 android_api="${ZXD_ANDROID_API:-24}"
 
 usage() {
@@ -129,17 +129,29 @@ case "$target" in
     }
     if [[ "$target" == linux-arm64 ]]; then
       artifact_arch=aarch64
-      cc="${CC:-aarch64-linux-gnu-gcc}"
-      cxx="${CXX:-aarch64-linux-gnu-g++}"
-      strip_tool="${STRIP:-aarch64-linux-gnu-strip}"
-      verification_nm="${NM:-aarch64-linux-gnu-nm}"
-      verification_readelf="${READELF:-aarch64-linux-gnu-readelf}"
-      cmake_args+=(
-        -DCMAKE_SYSTEM_NAME=Linux
-        -DCMAKE_SYSTEM_PROCESSOR=aarch64
-        -DCMAKE_C_COMPILER="$cc"
-        -DCMAKE_CXX_COMPILER="$cxx"
-      )
+      if [[ "$(uname -m)" == aarch64 || "$(uname -m)" == arm64 ]]; then
+        cc="${CC:-gcc}"
+        cxx="${CXX:-g++}"
+        strip_tool="${STRIP:-strip}"
+        verification_nm="${NM:-nm}"
+        verification_readelf="${READELF:-readelf}"
+        cmake_args+=(
+          -DCMAKE_C_COMPILER="$cc"
+          -DCMAKE_CXX_COMPILER="$cxx"
+        )
+      else
+        cc="${CC:-aarch64-linux-gnu-gcc}"
+        cxx="${CXX:-aarch64-linux-gnu-g++}"
+        strip_tool="${STRIP:-aarch64-linux-gnu-strip}"
+        verification_nm="${NM:-aarch64-linux-gnu-nm}"
+        verification_readelf="${READELF:-aarch64-linux-gnu-readelf}"
+        cmake_args+=(
+          -DCMAKE_SYSTEM_NAME=Linux
+          -DCMAKE_SYSTEM_PROCESSOR=aarch64
+          -DCMAKE_C_COMPILER="$cc"
+          -DCMAKE_CXX_COMPILER="$cxx"
+        )
+      fi
     else
       artifact_arch=x86_64
       cc="${CC:-gcc}"
@@ -203,7 +215,11 @@ built_artifact="$build_dir/$output_name"
 }
 mkdir -p "$artifact_dir"
 artifact="$artifact_dir/$output_name"
-cp "$built_artifact" "$artifact"
+# GNU cp's sparse-file deallocation path can fail with EINVAL when an arm64
+# container writes through Docker Desktop's VirtioFS mount. A byte stream copy
+# is deterministic and works identically on native hosts and cross containers.
+cat "$built_artifact" > "$artifact"
+chmod 755 "$artifact"
 if [[ "$os" == android || "$os" == linux ]]; then
   "$strip_tool" --strip-unneeded "$artifact"
 elif [[ "$os" == windows ]]; then
@@ -308,7 +324,7 @@ elif [[ "$os" == windows ]]; then
     | awk '
         /\[Ordinal\/Name Pointer\] Table/ { exports=1; next }
         exports && /^\t\[[[:space:]]*[0-9]+\]/ { print $NF; next }
-        exports && NF == 0 { exit }
+        exports && NF == 0 { exports=0 }
       ' | sort -u \
     > "$build_dir/actual_exports.txt"
 fi
@@ -318,7 +334,7 @@ if ! diff -u "$expected_exports" "$build_dir/actual_exports.txt"; then
   exit 1
 fi
 
-strings "$artifact" | grep 'zxing_dart ABI 1; zxing-cpp 2.3.0' >/dev/null || {
+strings "$artifact" | grep 'zxing_dart ABI 1; zxing-cpp 3.1.1' >/dev/null || {
   echo 'Artifact build-info string is missing or unexpected.' >&2
   exit 1
 }

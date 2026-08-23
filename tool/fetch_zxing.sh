@@ -6,9 +6,9 @@
 # a full conformance run.
 set -euo pipefail
 
-# v2.3.0 (2025-01-01). Same revision flutter_zxing 2.3.0 ships against, so its
-# issue tracker doubles as a field report for this exact decoder revision.
-readonly PIN_COMMIT="d6068bcebeb8fd9f0d35a99b00d202be86a14dbe"
+# v3.1.1. Keep the immutable commit rather than trusting a movable tag during
+# production rebuilds. Upgrades require the full synthetic + native matrix.
+readonly PIN_COMMIT="287c85df6f961c8efbfb5ffd736cd9457b8b890e"
 readonly REPO_URL="https://github.com/zxing-cpp/zxing-cpp.git"
 
 cd "$(dirname "$0")/.."

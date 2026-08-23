@@ -9,7 +9,7 @@ command -v docker >/dev/null || { echo 'docker is required' >&2; exit 1; }
 
 docker run --rm --platform linux/amd64 \
   -v "$root:/workspace" -w /workspace \
-  debian:bullseye-slim@sha256:cba95a21c96c1f5fc2470081829363eed57706634f7dc26e8c6712934303d57a \
+  debian:bookworm-slim@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241 \
   bash -lc '
     set -euo pipefail
     export DEBIAN_FRONTEND=noninteractive

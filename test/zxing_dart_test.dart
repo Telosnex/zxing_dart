@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:test/test.dart';
 import 'package:zxing_dart/zxing_dart.dart';
 
@@ -22,7 +23,7 @@ void main() {
     expect(identical(first, second), isTrue);
     expect(first.runtime, expectedRuntime);
     expect(first.abiVersion, 1);
-    expect(first.buildInfo, 'zxing_dart ABI 1; zxing-cpp 2.3.0');
+    expect(first.buildInfo, 'zxing_dart ABI 1; zxing-cpp 3.1.1');
     expect(first.canReadBarcodes, isTrue);
     expect(first.canEncodeAztec, isTrue);
   });
@@ -33,6 +34,13 @@ void main() {
     expect((matrix.width, matrix.height), (41, 41));
     expect(matrix.rowStride, 6);
     expect(matrix.bits.length, matrix.rowStride * matrix.height);
+    // Locks the renderer-facing modules across the 2.3.0 -> 3.1.1 upgrade.
+    // The classic writer is deliberate until a versioned API can express the
+    // new zint-backed writer's different ECC semantics.
+    expect(
+      sha256.convert(matrix.bits).toString(),
+      'bd57bfd2509940860a3303b52b09e00cd7c8d3446938656e7e7cc15a428a24c2',
+    );
     expect(() => matrix.bits[0] = 0, throwsUnsupportedError);
     // Aztec's central bullseye is dark at the exact center.
     expect(matrix.isDark(matrix.width ~/ 2, matrix.height ~/ 2), isTrue);

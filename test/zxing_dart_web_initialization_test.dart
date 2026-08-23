@@ -43,6 +43,6 @@ void main() {
     );
     final capabilities = await ZxingDart.capabilities;
     expect(capabilities.runtime, ZxingRuntime.webAssembly);
-    expect(capabilities.buildInfo, contains('zxing-cpp 2.3.0'));
+    expect(capabilities.buildInfo, contains('zxing-cpp 3.1.1'));
   });
 }

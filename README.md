@@ -55,9 +55,12 @@ Documented in `src/zxing_dart.h`; highlights:
 
 | Component | Version | License | Pin |
 |---|---|---|---|
-| zxing-cpp | v2.3.0 | Apache-2.0 | `d6068bcebeb8fd9f0d35a99b00d202be86a14dbe` |
+| zxing-cpp | v3.1.1 | Apache-2.0 | `287c85df6f961c8efbfb5ffd736cd9457b8b890e` |
 | dart_alloc.h | flutter_zxing 2.3.0 | MIT | adapted, attributed in-file |
 | `barcode` test oracle | 2.2.9 | Apache-2.0 | exact dev-dependency pin |
+
+The 2.3.0 → 3.1.1 API/toolchain/size analysis is recorded in
+[`doc/ZXING_CPP_3_1_1_UPGRADE.md`](doc/ZXING_CPP_3_1_1_UPGRADE.md).
 
 Pin bumps are reviewed changes accompanied by a full conformance run.
 
@@ -112,7 +115,7 @@ Web calls use the same C ABI compiled with Emscripten. Each Wasm runtime lives
 in a module Worker; a bounded pool serializes one operation per runtime,
 transfers private call-time snapshots, routes responses by request ID, and
 replaces a Worker that crashes without replaying the failed operation. No CDN
-or platform barcode service is used. The 1.0 MiB Wasm binary and its loader are
+or platform barcode service is used. The 1.2 MiB Wasm binary and its loader are
 committed package assets with hashes in `native_artifacts/manifest.json`.
 
 ## Milestones
@@ -130,8 +133,9 @@ committed package assets with hashes in `native_artifacts/manifest.json`.
    (Windows under Wine).
 5. ✅ Package-owned conformance v1: 40 deterministic camera recipes covering
    rotation/perspective/distance/blur/motion/glare/moiré/exposure/noise/stride
-   and compound scenes; 60 tasks per backend across production, independent
-   pure-Dart writer, and high-ECC profiles; 6,144 malformed C-ABI cases under
+   and compound scenes; 70 tasks per backend across production, independent
+   pure-Dart writer, high-ECC, and QR format-bridge profiles; 6,144 malformed
+   C-ABI cases under
    ASan/UBSan. See `test/SYNTHETIC_CORPUS.md`.
 6. Consumed by Telosnex `PairingCodeReader`/`PairingCodeRenderer` adapters;
    adapter acceptance adds parity against platform decoders on real devices.

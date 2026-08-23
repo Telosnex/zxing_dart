@@ -5,7 +5,7 @@ symbol—not a directory of opaque screenshots.
 
 ## Oracles
 
-The suite has three independently useful source profiles:
+The suite has four independently useful source profiles:
 
 1. **Production writer:** the full 119-byte `tnx2:` pairing envelope encoded by
    pinned zxing-cpp at default ECC.
@@ -17,10 +17,13 @@ The suite has three independently useful source profiles:
 3. **Compact/high-ECC:** a short envelope encoded at ECC level 8, proving that
    transform behavior is not accidentally specific to the 41×41 production
    matrix.
+4. **QR format bridge:** an independently encoded QR symbol through 10 hard
+   transforms, locking ABI v1's QR bit flag across zxing-cpp 3.x's incompatible
+   internal format-ID redesign.
 
-Every positive result must be byte-exact, text-exact, Aztec-formatted, and have
-nondegenerate in-frame geometry centered on the rendered object. Negative
-scenes must return `null`, never a false payload.
+Every positive result must be byte-exact, text-exact, report the expected
+symbology, and have nondegenerate in-frame geometry centered on the rendered
+object. Negative scenes must return `null`, never a false payload.
 
 ## v1 scenes
 
@@ -39,11 +42,12 @@ The primary manifest contains 40 stable IDs:
   noise, and/or moiré;
 - blank, random-noise, and finder-destroyed negatives.
 
-The hard subset applies 10 of those transforms to each alternate writer/ECC
-profile, for **60 decode tasks per backend**. Pixels are inverse-projected from
-modules through a homography with fixed four-sample photosite integration, then
-optical/sensor effects are applied in luminance space. The generator has no
-canvas, image codec, global RNG, or checked-in raster dependency.
+The hard subset applies 10 of those transforms to each alternate writer/ECC/
+format profile, for **70 decode tasks per backend**. Pixels are inverse-
+projected from modules through a homography with fixed four-sample photosite
+integration, then optical/sensor effects are applied in luminance space. The
+generator has no canvas, image codec, global RNG, or checked-in raster
+dependency.
 
 This is a regression/conformance model, not a claim that synthetic noise has the
 same distribution as every physical camera. Real capture fixtures should be

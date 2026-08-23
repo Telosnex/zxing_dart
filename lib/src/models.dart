@@ -119,7 +119,7 @@ final class BarcodeResult {
   /// zxing-cpp's UTF-8 representation of the content.
   final String text;
 
-  /// The raw `ZXing::BarcodeFormat` value, retained for forward compatibility.
+  /// The stable shim format value, retained for forward compatibility.
   final int nativeFormat;
 
   BarcodeFormat? get format => BarcodeFormat.fromNativeValue(nativeFormat);

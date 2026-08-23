@@ -84,7 +84,10 @@ void main() {
   test(
     'independent pure-Dart Aztec encoder survives hard transform subset',
     () async {
-      final independent = _encodeWithPureDart(syntheticPairingPayload);
+      final independent = _encodeWithPureDart(
+        Barcode.aztec(),
+        syntheticPairingPayload,
+      );
       // package:barcode is a separate pure-Dart implementation. Canonical
       // inputs can legitimately produce the same modules as zxing-cpp, which
       // is useful parity rather than evidence of a self-round-trip.
@@ -99,6 +102,35 @@ void main() {
         final result = await _decode(testCase);
         expect(result, isNotNull, reason: _reason(testCase));
         _expectExactResult(testCase, result!);
+      }
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
+
+  test(
+    'stable QR format translation survives the hard transform subset',
+    () async {
+      const payload = 'tnx2:qr-format-translation';
+      final matrix = _encodeWithPureDart(Barcode.qrCode(), payload);
+      final corpus = buildHardTransformCorpus(matrix, expectedText: payload);
+      expect(corpus, hasLength(10));
+      for (final testCase in corpus) {
+        final frame = testCase.frame;
+        final result = await ZxingDart.readBarcode(
+          frame.bytes,
+          width: frame.width,
+          height: frame.height,
+          rowStride: frame.rowStride,
+          pixelFormat: frame.pixelFormat,
+          formats: const {BarcodeFormat.qrCode},
+          tryHarder: true,
+        );
+        expect(result, isNotNull, reason: _reason(testCase));
+        _expectExactResult(
+          testCase,
+          result!,
+          expectedFormat: BarcodeFormat.qrCode,
+        );
       }
     },
     timeout: const Timeout(Duration(minutes: 2)),
@@ -135,14 +167,18 @@ Future<BarcodeResult?> _decode(SyntheticCameraCase testCase) {
   );
 }
 
-void _expectExactResult(SyntheticCameraCase testCase, BarcodeResult result) {
+void _expectExactResult(
+  SyntheticCameraCase testCase,
+  BarcodeResult result, {
+  BarcodeFormat expectedFormat = BarcodeFormat.aztec,
+}) {
   expect(result.text, testCase.expectedText, reason: _reason(testCase));
   expect(
     result.bytes,
     ascii.encode(testCase.expectedText!),
     reason: _reason(testCase),
   );
-  expect(result.format, BarcodeFormat.aztec, reason: _reason(testCase));
+  expect(result.format, expectedFormat, reason: _reason(testCase));
 
   final frame = testCase.frame;
   final corners = result.position.corners;
@@ -183,12 +219,9 @@ void _expectExactResult(SyntheticCameraCase testCase, BarcodeResult result) {
   );
 }
 
-BarcodeMatrix _encodeWithPureDart(String payload) {
-  final encoder = Barcode.aztec();
+BarcodeMatrix _encodeWithPureDart(Barcode encoder, String payload) {
   if (encoder is! Barcode2D) {
-    throw StateError(
-      'package:barcode Aztec encoder stopped being two-dimensional',
-    );
+    throw StateError('package:barcode encoder stopped being two-dimensional');
   }
   final source = encoder.convert(Uint8List.fromList(ascii.encode(payload)));
   final pixels = source.pixels.toList(growable: false);

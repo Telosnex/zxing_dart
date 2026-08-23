@@ -2,15 +2,9 @@ cmake_minimum_required(VERSION 3.16)
 
 project(zxing_dart LANGUAGES CXX)
 
-# zxing-cpp v2.3.0 aliases char8_t to uint8_t under C++17. Current
-# Emscripten/Android libc++ intentionally has no std::char_traits<unsigned
-# char>, while C++20's real char8_t is supported. Apple artifacts remain
-# C++17; Android/Wasm use C++20 solely for upstream compatibility.
-if(EMSCRIPTEN OR ANDROID)
-  set(CMAKE_CXX_STANDARD 20)
-else()
-  set(CMAKE_CXX_STANDARD 17)
-endif()
+# zxing-cpp 3.x uses concepts/ranges and requires C++20. This also avoids the
+# old C++17 char8_t alias incompatibility in current Emscripten/Android libc++.
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -20,7 +14,10 @@ option(ZXD_BUILD_TESTS "Build native conformance/smoke tests" OFF)
 # shared lib so the shipped artifact is a single binary.
 set(BUILD_SHARED_LIBS OFF)
 set(ZXING_READERS ON)
-set(ZXING_WRITERS ON)
+# Preserve this package's documented Aztec ECC 0..8 behavior. v3's new
+# zint-backed writer has percentage/string ECC semantics; the retained classic
+# writer is the compatible API while the reader receives all 3.1.1 changes.
+set(ZXING_WRITERS OLD)
 set(ZXING_C_API OFF)
 set(ZXING_EXAMPLES OFF)
 set(ZXING_UNIT_TESTS OFF)

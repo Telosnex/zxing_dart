@@ -46,9 +46,9 @@ extern "C" {
 #define ZXD_PIXEL_BGRA8888 2 // 4 bytes/px, B first in memory.
 
 // ---------------------------------------------------------------------------
-// Barcode format flags. Values intentionally mirror ZXing::BarcodeFormat so
-// the mask passes through unchanged. Only the symbologies we actually use are
-// named here; other bits pass through to zxing-cpp untouched.
+// Stable barcode format flags. These preserve zxing-cpp 2.x's public bit
+// values, but the shim explicitly translates them to/from the pinned upstream
+// representation. zxing-cpp 3.x no longer uses bit flags internally.
 // ---------------------------------------------------------------------------
 #define ZXD_FORMAT_ANY 0 // mask 0 == let zxing-cpp try all formats
 #define ZXD_FORMAT_AZTEC (1 << 0)
@@ -66,7 +66,7 @@ typedef struct zxd_read_result {
     // Content rendered as NUL-terminated UTF-8 text. Same ownership as
     // `bytes`. May be NULL.
     char* text;
-    // ZXing::BarcodeFormat value of the decoded symbol.
+    // Stable ZXD_FORMAT_* value of the decoded symbol (not an upstream enum).
     int32_t format;
     // Detection geometry in source-image pixel coordinates:
     // [TLx, TLy, TRx, TRy, BRx, BRy, BLx, BLy].

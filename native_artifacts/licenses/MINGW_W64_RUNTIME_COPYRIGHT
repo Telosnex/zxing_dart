@@ -64,7 +64,6 @@ Files: mingw-w64-crt/crt/*
        mingw-w64-crt/libsrc/scrnsave.c
        mingw-w64-crt/libsrc/tsuserex_i.c
        mingw-w64-crt/math/cbrt*.c
-       mingw-w64-crt/math/cephes_emath.*
        mingw-w64-crt/math/copysign*
        mingw-w64-crt/math/cosh*.c
        mingw-w64-crt/math/erfl.c
@@ -644,7 +643,7 @@ Copyright: 2009 Andrew Nguyen
 License: LGPL-2.1+
 
 Files: mingw-w64-headers/include/taskschd.idl
-       mingw-w64-headers/tlb/oleacc.idl
+       mingw-w64-headers/tlb/oleacc.dll.idl
 Copyright: 2013 Dmitry Timoshkov
 License: LGPL-2.1+
 
@@ -802,7 +801,8 @@ License: LGPL-2+
 
 Files: debian/*
 Copyright: 2009, 2010 Robert Millan
-           2010-2018 Stephen Kitt <skitt@debian.org>
+           2010-2020, 2022 Stephen Kitt <skitt@debian.org>
+           2022 Konstantin Demin
 License: GPL-2+
 
 Files: debian/pkg-config-crosswrapper

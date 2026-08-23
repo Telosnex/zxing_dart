@@ -7,37 +7,38 @@ native dependencies, a system zxing installation, or a CDN.
 
 ## Source and toolchain pins
 
-- zxing-cpp `d6068bcebeb8fd9f0d35a99b00d202be86a14dbe` (`v2.3.0`)
-- native build profile `3`
+- zxing-cpp `287c85df6f961c8efbfb5ffd736cd9457b8b890e` (`v3.1.1`)
+- native build profile `4`
 - Apple: Xcode 26 / Apple clang 17; macOS 12, iOS 13
 - Android: NDK `28.2.13676358`, API 24, static libc++, 16KB page alignment
-- Linux: pinned Debian bullseye-slim, GCC 10, static libstdc++/libgcc
-- Windows: same pinned Debian image, MinGW-w64 POSIX x64, static runtimes
+- Linux: pinned GCC 12.3-on-bullseye, glibc 2.31, static libstdc++/libgcc
+- Windows: pinned Debian bookworm-slim, MinGW-w64 GCC 12 POSIX x64,
+  static runtimes
 - Web: Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)
 
 Artifacts expose only the six `zxd_*` C ABI symbols. Upstream C++ symbols are
 hidden by an exported-symbol list (Apple), ELF version script (Android/Linux),
 or module definition file (Windows).
-Licenses and notices are under `licenses/`, including LLVM/libc++ for Android
-and the GCC Runtime Library Exception plus MinGW notices for statically linked
-Linux/Windows runtime components.
+Licenses and notices are under `licenses/`, including LLVM/libc++ for Android,
+GCC 12's GPLv3 text and Runtime Library Exception, and MinGW notices for
+statically linked Linux/Windows runtime components.
 
 ## Complete intentional matrix
 
 | Target | Minimum | SHA-256 |
 |---|---:|---|
-| macOS arm64 | 12 | `1e270cbc35b5fd39b36a4cfc4790d371cb4c594b4665154cb2fbab9a5431d895` |
-| macOS x64 | 12 | `d3bd9606f5fb720d50862763d05f04d5219d6435073e366b5cb26f8642519d9f` |
-| iOS arm64 device | 13 | `0957bb83b02d8e82bfab1a63595900b68606536d4ec3af008ddda1ad2dae53bc` |
-| iOS arm64 simulator | 14¹ | `a434546d8d781dfcc9e6460c54c69b396034d5bc01fa3548db2cb580daad952e` |
-| iOS x64 simulator | 13 | `3772bfb533e76da42be09185ce800923b91c73b33b809b15d30abbac1530bc08` |
-| Android armv7 | API 24 | `3b3501bb9120ff72fc1f5e78ade0791e74de544382805984493b5ae4bc8dec54` |
-| Android arm64 | API 24 | `bb311390877085e6c058a413d36ac260d23b134135b356226479588b9e3dbbac` |
-| Android x64 | API 24 | `9fafd7d0ef35c7cd9781dc1b8460f8284efde63de109bb832e649675743b808d` |
-| Linux arm64 | glibc 2.31 baseline | `265167d89428e966e628afac8c51b1c1695fccc08f3a7b4452a17ed22a52d6a2` |
-| Linux x64 | glibc 2.31 baseline | `54aa5c7493b72de5f97b22500841fcb0846ef85c4fe8bbb682e094ce6c4faf8a` |
-| Windows x64 | MinGW/Win32 | `d43c7e192c735264adfa1a8bb8a09d8df5cb7e6b256c47ebd745a8ce939c0db3` |
-| Browser Wasm | module Worker + Wasm | `6d05811c77c07eb044310e1c2871d964e78ca86268be1350679495c182b0e8fb` |
+| macOS arm64 | 12 | `edaebf613fb8ce9094ecf8c0476576fa58b87b54c52201c368e36fbb0e5b5b24` |
+| macOS x64 | 12 | `6c9278ce2e9fb8d00ec741cdaa4184aa6c9fe78e17924cddf7dd7b7b6ac6d039` |
+| iOS arm64 device | 13 | `4b3372d5d50a6f2a2d097ed37d45bea51e532b6c7b0c9ea35053a66cee0e4695` |
+| iOS arm64 simulator | 14¹ | `12af8774185d43292598421593055b79f38ef3c8c3fdef66729001521a4537fa` |
+| iOS x64 simulator | 13 | `1a0485ddc4471b3cd5d4b0d4dc819c34b0724b1cf7aca414852ceeaa6fda00e9` |
+| Android armv7 | API 24 | `ae8f07033364f048ab6427e252247613432d6834b83cee1048fc0c48211182ca` |
+| Android arm64 | API 24 | `75b9f109fcbb3c44045ce99c7d3cc882ea78656c4fc57f1bb4222ef517e992c6` |
+| Android x64 | API 24 | `c29f0e291aa30f0f903f2603a5ccaae897e33c8bc8d9b1f5396a5970719b8a17` |
+| Linux arm64 | glibc 2.31 baseline | `3709d7e991cd6ff9788d6400f94df20cee9fe2cb2a09b1876975b2526ffd44b9` |
+| Linux x64 | glibc 2.31 baseline | `300f776be44e7ca133717a66acffa82a7a03cdd3a0b13d4bac7cd6407d40569c` |
+| Windows x64 | MinGW/Win32 | `a8b54d40ace4a0d33e878fc619329bf327d9d747c3a6623c8c89646b51313d86` |
+| Browser Wasm | module Worker + Wasm | `ff1f2d98b1ac85b22df85e6ea578c6aead8afba0606e8c2397bc098a159f4851` |
 
 ¹ arm64 Simulator did not exist before iOS 14; x64 covers iOS 13 simulators.
 
