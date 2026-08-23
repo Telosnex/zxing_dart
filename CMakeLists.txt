@@ -66,6 +66,30 @@ if(ANDROID)
   )
 endif()
 
+if(UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
+  target_link_options(zxing_dart PRIVATE
+    -static-libgcc -static-libstdc++
+    "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/src/exports_elf.map"
+    "-Wl,--exclude-libs,ALL"
+    "-Wl,-z,relro,-z,now"
+  )
+endif()
+
+if(WIN32)
+  # CoTaskMemAlloc/CoTaskMemFree are the allocator pair used by package:ffi on
+  # Windows. A .def file makes the complete public surface auditable and keeps
+  # all statically folded zxing-cpp symbols private.
+  target_sources(zxing_dart PRIVATE src/exports_windows.def)
+  target_link_libraries(zxing_dart PRIVATE ole32)
+  if(MINGW)
+    target_link_options(zxing_dart PRIVATE
+      -static -static-libgcc -static-libstdc++
+      "-Wl,--no-insert-timestamp"
+    )
+  endif()
+  set_target_properties(zxing_dart PROPERTIES PREFIX "" OUTPUT_NAME "zxing_dart")
+endif()
+
 if(ZXD_BUILD_TESTS)
   add_executable(zxd_smoke_test native_test/smoke_test.cpp)
   target_include_directories(zxd_smoke_test PRIVATE src)

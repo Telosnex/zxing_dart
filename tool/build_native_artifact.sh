@@ -6,7 +6,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="${1:-}"
-profile_version=2
+profile_version=3
 android_api="${ZXD_ANDROID_API:-24}"
 
 usage() {
@@ -18,16 +18,18 @@ Targets:
   ios-arm64-iphoneos       ios-arm64-iphonesimulator
   ios-x64-iphonesimulator
   android-arm              android-arm64              android-x64
+  linux-arm64              linux-x64
+  windows-x64
 
 Apple targets require Xcode. Android targets require ANDROID_NDK_HOME or a
-standard Android SDK installation. Linux and Windows are intentionally not
-supported by this package.
+standard Android SDK installation. Linux/Windows targets use Linux compilers
+directly or the provided pinned Docker wrappers.
 EOF
   exit 64
 }
 
 case "$target" in
-  macos-arm64|macos-x64|ios-arm64-iphoneos|ios-arm64-iphonesimulator|ios-x64-iphonesimulator|android-arm|android-arm64|android-x64) ;;
+  macos-arm64|macos-x64|ios-arm64-iphoneos|ios-arm64-iphonesimulator|ios-x64-iphonesimulator|android-arm|android-arm64|android-x64|linux-arm64|linux-x64|windows-x64) ;;
   *) usage ;;
 esac
 
@@ -119,6 +121,66 @@ case "$target" in
     verification_readelf="$llvm_bin/llvm-readelf"
     strip_tool="$llvm_bin/llvm-strip"
     ;;
+  linux-arm64|linux-x64)
+    os=linux
+    [[ "$(uname -s)" == Linux ]] || {
+      echo 'Linux artifacts must be built on Linux; use build_native_linux_docker.sh.' >&2
+      exit 1
+    }
+    if [[ "$target" == linux-arm64 ]]; then
+      artifact_arch=aarch64
+      cc="${CC:-aarch64-linux-gnu-gcc}"
+      cxx="${CXX:-aarch64-linux-gnu-g++}"
+      strip_tool="${STRIP:-aarch64-linux-gnu-strip}"
+      verification_nm="${NM:-aarch64-linux-gnu-nm}"
+      verification_readelf="${READELF:-aarch64-linux-gnu-readelf}"
+      cmake_args+=(
+        -DCMAKE_SYSTEM_NAME=Linux
+        -DCMAKE_SYSTEM_PROCESSOR=aarch64
+        -DCMAKE_C_COMPILER="$cc"
+        -DCMAKE_CXX_COMPILER="$cxx"
+      )
+    else
+      artifact_arch=x86_64
+      cc="${CC:-gcc}"
+      cxx="${CXX:-g++}"
+      strip_tool="${STRIP:-strip}"
+      verification_nm="${NM:-nm}"
+      verification_readelf="${READELF:-readelf}"
+      cmake_args+=(
+        -DCMAKE_C_COMPILER="$cc"
+        -DCMAKE_CXX_COMPILER="$cxx"
+        -DZXD_BUILD_TESTS=ON
+      )
+      run_smoke=true
+    fi
+    output_name=libzxing_dart.so
+    ;;
+  windows-x64)
+    os=windows
+    [[ "$(uname -s)" == Linux ]] || {
+      echo 'Windows artifacts must be cross-built on Linux; use build_native_windows_docker.sh.' >&2
+      exit 1
+    }
+    artifact_arch=x86_64
+    # Debian's default MinGW alternative uses the win32 thread model, whose
+    # libstdc++ lacks std::once_flag/call_once. zxing-cpp requires them, so pin
+    # the POSIX-thread compiler variant and statically fold libwinpthread in.
+    cc="${CC:-x86_64-w64-mingw32-gcc-posix}"
+    cxx="${CXX:-x86_64-w64-mingw32-g++-posix}"
+    strip_tool="${STRIP:-x86_64-w64-mingw32-strip}"
+    verification_nm="${NM:-x86_64-w64-mingw32-nm}"
+    verification_objdump="${OBJDUMP:-x86_64-w64-mingw32-objdump}"
+    cmake_args+=(
+      -DCMAKE_SYSTEM_NAME=Windows
+      -DCMAKE_SYSTEM_PROCESSOR=x86_64
+      -DCMAKE_C_COMPILER="$cc"
+      -DCMAKE_CXX_COMPILER="$cxx"
+      -DCMAKE_RC_COMPILER="${WINDRES:-x86_64-w64-mingw32-windres}"
+      -DCMAKE_SHARED_LINKER_FLAGS=-Wl,--no-insert-timestamp
+    )
+    output_name=zxing_dart.dll
+    ;;
 esac
 
 jobs="${ZXD_BUILD_JOBS:-$(sysctl -n hw.logicalcpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
@@ -127,7 +189,7 @@ cmake -S "$root" -B "$build_dir" "${cmake_args[@]}"
 cmake --build "$build_dir" --target zxing_dart --parallel "$jobs"
 if [[ "$run_smoke" == true ]]; then
   cmake --build "$build_dir" --target zxd_smoke_test --parallel "$jobs"
-  if [[ "$artifact_arch" == x86_64 && "$(uname -m)" == arm64 ]]; then
+  if [[ "$os" == macos && "$artifact_arch" == x86_64 && "$(uname -m)" == arm64 ]]; then
     arch -x86_64 "$build_dir/zxd_smoke_test"
   else
     "$build_dir/zxd_smoke_test"
@@ -142,7 +204,9 @@ built_artifact="$build_dir/$output_name"
 mkdir -p "$artifact_dir"
 artifact="$artifact_dir/$output_name"
 cp "$built_artifact" "$artifact"
-if [[ "$os" == android ]]; then
+if [[ "$os" == android || "$os" == linux ]]; then
+  "$strip_tool" --strip-unneeded "$artifact"
+elif [[ "$os" == windows ]]; then
   "$strip_tool" --strip-unneeded "$artifact"
 else
   "$strip_tool" -x "$artifact"
@@ -192,29 +256,60 @@ if [[ "$os" == macos || "$os" == ios ]]; then
   grep -q "minos $expected_min" <<<"$build_version" || {
     echo "Missing expected minimum OS $expected_min" >&2; exit 1;
   }
-else
+elif [[ "$os" == android || "$os" == linux ]]; then
   machine="$($verification_readelf -h "$artifact" | awk -F: '/Machine:/ {sub(/^[[:space:]]+/, "", $2); print $2}')"
   case "$target:$machine" in
     android-arm:'ARM') ;;
     android-arm64:'AArch64') ;;
     android-x64:'Advanced Micro Devices X86-64') ;;
+    linux-arm64:'AArch64') ;;
+    linux-x64:'Advanced Micro Devices X86-64') ;;
     *) echo "Unexpected ELF machine for $target: $machine" >&2; exit 1 ;;
   esac
-  if "$verification_readelf" -d "$artifact" | grep -E 'NEEDED.*(ZXing|c\+\+_shared)'; then
-    echo 'Artifact unexpectedly depends on zxing-cpp or libc++_shared.' >&2
+  forbidden_dependency='ZXing|c\+\+_shared'
+  [[ "$os" == linux ]] && forbidden_dependency='ZXing|libstdc\+\+|libgcc_s'
+  if "$verification_readelf" -d "$artifact" | grep -E "NEEDED.*($forbidden_dependency)"; then
+    echo 'Artifact unexpectedly has an unbundled C++/ZXing dependency.' >&2
     exit 1
   fi
-  # Android 15+ supports 16KB page-size devices. Every LOAD segment must have
-  # at least 0x4000 alignment; our linker profile requests exactly that.
-  "$verification_readelf" -lW "$artifact" \
-    | awk '$1 == "LOAD" { print $NF }' > "$build_dir/load_alignments.txt"
-  if [[ ! -s "$build_dir/load_alignments.txt" ]] || \
-      grep -Evq '^0x0*4000$' "$build_dir/load_alignments.txt"; then
-    echo 'ELF LOAD segments are not all 16KB-page aligned.' >&2
-    exit 1
+  if [[ "$os" == linux ]]; then
+    "$verification_readelf" -d "$artifact" | grep 'SONAME.*libzxing_dart.so' >/dev/null || {
+      echo 'Linux artifact has no canonical libzxing_dart.so SONAME.' >&2; exit 1;
+    }
+    if "$verification_readelf" -d "$artifact" | grep -E 'RPATH|RUNPATH'; then
+      echo 'Linux artifact unexpectedly embeds an RPATH/RUNPATH.' >&2; exit 1;
+    fi
+  fi
+  if [[ "$os" == android ]]; then
+    # Android 15+ supports 16KB page-size devices. Every LOAD segment must
+    # have the requested 0x4000 alignment.
+    "$verification_readelf" -lW "$artifact" \
+      | awk '$1 == "LOAD" { print $NF }' > "$build_dir/load_alignments.txt"
+    if [[ ! -s "$build_dir/load_alignments.txt" ]] || \
+        grep -Evq '^0x0*4000$' "$build_dir/load_alignments.txt"; then
+      echo 'ELF LOAD segments are not all 16KB-page aligned.' >&2
+      exit 1
+    fi
   fi
   "$verification_nm" -D --defined-only "$artifact" \
-    | awk '{print $3}' | sed 's/@@.*//' | sort -u \
+    | awk '{print $3}' | sed 's/@@.*//; /^ZXING_DART_1$/d' | sort -u \
+    > "$build_dir/actual_exports.txt"
+elif [[ "$os" == windows ]]; then
+  machine="$($verification_objdump -f "$artifact" | awk '/architecture:/ {gsub(",", "", $2); print $2}')"
+  [[ "$machine" == i386:x86-64 ]] || {
+    echo "Unexpected PE machine: $machine" >&2; exit 1;
+  }
+  if "$verification_objdump" -p "$artifact" \
+      | grep -Ei 'DLL Name:.*(ZXing|libstdc\+\+|libgcc_s|winpthread)'; then
+    echo 'Windows artifact has an unbundled C++/ZXing runtime dependency.' >&2
+    exit 1
+  fi
+  "$verification_objdump" -p "$artifact" \
+    | awk '
+        /\[Ordinal\/Name Pointer\] Table/ { exports=1; next }
+        exports && /^\t\[[[:space:]]*[0-9]+\]/ { print $NF; next }
+        exports && NF == 0 { exit }
+      ' | sort -u \
     > "$build_dir/actual_exports.txt"
 fi
 

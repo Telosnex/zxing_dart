@@ -1,0 +1,8 @@
+LIBRARY zxing_dart
+EXPORTS
+  zxd_abi_version
+  zxd_build_info
+  zxd_encode_aztec
+  zxd_matrix_release
+  zxd_read
+  zxd_read_result_release

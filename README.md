@@ -64,12 +64,18 @@ Pin bumps are reviewed changes accompanied by a full conformance run.
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
-tool/build_all_native.sh # all macOS/iOS/Android production tuples
+tool/build_all_native.sh # all eleven native production tuples
 tool/build_web.sh     # pinned Emscripten ES module + Wasm
 dart test             # verifies code-asset hash, ABI, Dart/FFI/isolate path
 tool/test_all.sh      # VM + Chrome dart2js + Chrome dart2wasm + Safari
 tool/test_ios_simulator.sh
 ZXD_ANDROID_AVD=Medium_Phone_API_36.0 tool/test_android_device.sh
+tool/test_linux_docker.sh linux-arm64
+tool/test_linux_docker.sh linux-x64
+tool/test_linux_dart_docker.sh linux-arm64
+tool/test_linux_dart_docker.sh linux-x64
+tool/test_windows_wine_docker.sh
+tool/test_windows_dart_wine_docker.sh # x64 Linux CI host
 ```
 
 ## Dart API (milestone 2)
@@ -111,10 +117,11 @@ committed package assets with hashes in `native_artifacts/manifest.json`.
 3. ✅ Emscripten module + worker pool + loader, deterministic pinned web
    artifacts, VM/Chrome dart2js/Chrome dart2wasm/Safari parity suite, Worker
    initialization/error/replacement tests
-4. ✅ Complete intentional native matrix: Android armv7/arm64/x64, iOS arm64
-   device + arm64/x64 simulator, macOS arm64/x64; restricted export surfaces,
-   16KB Android pages, verified hashes, macOS/Rosetta + real iOS Simulator +
-   Android emulator ABI runtime tests. Linux/Windows intentionally unsupported.
+4. ✅ Complete native matrix: Android armv7/arm64/x64, iOS arm64 device +
+   arm64/x64 simulator, macOS arm64/x64, Linux arm64/x64, Windows x64;
+   restricted export surfaces, static C++ runtimes where appropriate, 16KB
+   Android pages, verified hashes, and runtime ABI tests on every OS family
+   (Windows under Wine).
 5. Conformance corpora: synthetic camera torture (rotation/blur/glare/moiré),
    malformed-frame fuzzing at the shim boundary, cross-decoder parity
    (this vs platform decoders vs pure-Dart `barcode` encoder)

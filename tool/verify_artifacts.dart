@@ -25,6 +25,9 @@ Future<void> main() async {
     'android-arm',
     'android-arm64',
     'android-x64',
+    'linux-arm64',
+    'linux-x64',
+    'windows-x64',
   };
   if (native.keys.toSet().difference(expectedNativeTargets).isNotEmpty ||
       expectedNativeTargets.difference(native.keys.toSet()).isNotEmpty) {

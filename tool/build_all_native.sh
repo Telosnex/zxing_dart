@@ -18,4 +18,12 @@ do
   ./tool/build_native_artifact.sh "$target"
 done
 
+for target in linux-arm64 linux-x64; do
+  echo "=== $target ==="
+  ./tool/build_native_linux_docker.sh "$target"
+done
+
+echo '=== windows-x64 ==='
+./tool/build_native_windows_docker.sh windows-x64
+
 dart run tool/verify_artifacts.dart

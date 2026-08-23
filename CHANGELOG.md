@@ -4,6 +4,6 @@
 - Add asynchronous Dart encode/decode API with native helper-isolate backend.
 - Add bundled Emscripten WebAssembly Worker backend and browser pool.
 - Add SHA-256-pinned production artifacts for Android armv7/arm64/x64, iOS
-  device/simulator, macOS arm64/x64, and web.
-- Add native, VM, Chrome dart2js, Chrome dart2wasm, Safari, iOS Simulator, and
-  Android emulator conformance gates.
+  device/simulator, macOS arm64/x64, Linux arm64/x64, Windows x64, and web.
+- Add native, VM, Chrome dart2js, Chrome dart2wasm, Safari, iOS Simulator,
+  Android emulator, Linux container, and Windows/Wine conformance gates.

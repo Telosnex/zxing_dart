@@ -1,12 +1,14 @@
 {
   "schema": 1,
-  "profile": 1,
+  "profile": 3,
   "sources": {
     "zxing-cpp": "d6068bcebeb8fd9f0d35a99b00d202be86a14dbe"
   },
   "toolchains": {
     "apple": "Xcode 26, Apple clang 17.0.0",
     "android": "Android NDK 28.2.13676358, API 24, libc++ static",
+    "linux": "Debian bullseye-slim cba95a21, GCC 10, static libstdc++/libgcc",
+    "windows": "Debian bullseye-slim cba95a21, MinGW-w64 POSIX x64, static runtimes",
     "web": "Emscripten 5.0.0 a7c5deabd7c88ba1c38ebe988112256775f944c6"
   },
   "web": {
@@ -59,6 +61,18 @@
     "android-x64": {
       "path": "android-x64/libzxing_dart.so",
       "sha256": "9fafd7d0ef35c7cd9781dc1b8460f8284efde63de109bb832e649675743b808d"
+    },
+    "linux-arm64": {
+      "path": "linux-arm64/libzxing_dart.so",
+      "sha256": "265167d89428e966e628afac8c51b1c1695fccc08f3a7b4452a17ed22a52d6a2"
+    },
+    "linux-x64": {
+      "path": "linux-x64/libzxing_dart.so",
+      "sha256": "54aa5c7493b72de5f97b22500841fcb0846ef85c4fe8bbb682e094ce6c4faf8a"
+    },
+    "windows-x64": {
+      "path": "windows-x64/zxing_dart.dll",
+      "sha256": "d43c7e192c735264adfa1a8bb8a09d8df5cb7e6b256c47ebd745a8ce939c0db3"
     }
   }
 }
