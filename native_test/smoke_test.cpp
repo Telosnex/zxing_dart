@@ -166,6 +166,69 @@ void testHostileArgs()
     CHECK(zxd_encode_aztec(ok, 0, -1, &m) == ZXD_INVALID_ARGUMENT);
 }
 
+uint32_t fuzzNext(uint32_t& state)
+{
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    return state;
+}
+
+void testMalformedFrameFuzz()
+{
+    uint32_t state = 0xC001D00Du;
+    std::vector<uint8_t> storage(16 * 1024);
+
+    // 4,096 huge/overflow-shaped descriptors over a tiny allocation. Every
+    // one must be rejected before zxing-cpp observes a pixel. This targets the
+    // shim's security boundary rather than zxing's detector behavior.
+    for (int iteration = 0; iteration < 4096; ++iteration) {
+        const uint32_t width = 0x10000u + fuzzNext(state);
+        const uint32_t height = 0x10000u + fuzzNext(state);
+        const uint32_t stride = (iteration & 1) ? fuzzNext(state) : 0;
+        zxd_read_result result;
+        std::memset(&result, 0xA5, sizeof(result));
+        const int32_t status = zxd_read(
+            storage.data(), static_cast<uint32_t>(storage.size()), width, height,
+            stride, (iteration & 2) ? ZXD_PIXEL_RGBA8888 : ZXD_PIXEL_LUM8,
+            ZXD_FORMAT_AZTEC, iteration & 1, &result);
+        CHECK(status == ZXD_INVALID_ARGUMENT);
+        // Invalid calls still zero the output, making unconditional cleanup
+        // safe for Dart and for fuzz harnesses.
+        CHECK(result.bytes == nullptr && result.text == nullptr);
+        zxd_read_result_release(&result);
+    }
+
+    // 1,024 geometrically valid random luminance planes with random row
+    // padding, followed by the exact same descriptor truncated by one byte.
+    // Valid noise may be either NOT_FOUND or (astronomically) a valid symbol;
+    // it must never become an argument/internal error or escape ownership.
+    for (int iteration = 0; iteration < 1024; ++iteration) {
+        const uint32_t width = 1 + fuzzNext(state) % 96;
+        const uint32_t height = 1 + fuzzNext(state) % 96;
+        const uint32_t stride = width + fuzzNext(state) % 33;
+        const uint32_t length = stride * (height - 1) + width;
+        CHECK(length <= storage.size());
+        for (uint32_t index = 0; index < length; ++index) {
+            storage[index] = static_cast<uint8_t>(fuzzNext(state));
+        }
+
+        zxd_read_result result;
+        const int32_t status = zxd_read(
+            storage.data(), length, width, height, stride, ZXD_PIXEL_LUM8,
+            ZXD_FORMAT_AZTEC, 0, &result);
+        CHECK(status == ZXD_NOT_FOUND || status == ZXD_OK);
+        zxd_read_result_release(&result);
+
+        CHECK(zxd_read(
+                  storage.data(), length - 1, width, height, stride,
+                  ZXD_PIXEL_LUM8, ZXD_FORMAT_AZTEC, 0, &result) ==
+              ZXD_INVALID_ARGUMENT);
+        zxd_read_result_release(&result);
+    }
+    std::printf("  malformed-frame fuzz: 6144 deterministic boundary cases\n");
+}
+
 } // namespace
 
 int main()
@@ -184,6 +247,7 @@ int main()
 
     testNotFound();
     testHostileArgs();
+    testMalformedFrameFuzz();
 
     if (g_failures == 0) {
         std::printf("PASS: all smoke tests\n");

@@ -57,6 +57,7 @@ Documented in `src/zxing_dart.h`; highlights:
 |---|---|---|---|
 | zxing-cpp | v2.3.0 | Apache-2.0 | `d6068bcebeb8fd9f0d35a99b00d202be86a14dbe` |
 | dart_alloc.h | flutter_zxing 2.3.0 | MIT | adapted, attributed in-file |
+| `barcode` test oracle | 2.2.9 | Apache-2.0 | exact dev-dependency pin |
 
 Pin bumps are reviewed changes accompanied by a full conformance run.
 
@@ -76,6 +77,11 @@ tool/test_linux_dart_docker.sh linux-arm64
 tool/test_linux_dart_docker.sh linux-x64
 tool/test_windows_wine_docker.sh
 tool/test_windows_dart_wine_docker.sh # x64 Linux CI host
+tool/test_native_sanitizers.sh         # ABI corpus under ASan + UBSan
+
+# Reproduce any synthetic camera scene as a lossless image:
+dart run tool/render_synthetic_case.dart --list
+dart run tool/render_synthetic_case.dart v1/glare-edge /tmp/glare.pgm
 ```
 
 ## Dart API (milestone 2)
@@ -122,7 +128,10 @@ committed package assets with hashes in `native_artifacts/manifest.json`.
    restricted export surfaces, static C++ runtimes where appropriate, 16KB
    Android pages, verified hashes, and runtime ABI tests on every OS family
    (Windows under Wine).
-5. Conformance corpora: synthetic camera torture (rotation/blur/glare/moiré),
-   malformed-frame fuzzing at the shim boundary, cross-decoder parity
-   (this vs platform decoders vs pure-Dart `barcode` encoder)
-6. Consumed by Telosnex `PairingCodeReader`/`PairingCodeRenderer` adapters
+5. ✅ Package-owned conformance v1: 40 deterministic camera recipes covering
+   rotation/perspective/distance/blur/motion/glare/moiré/exposure/noise/stride
+   and compound scenes; 60 tasks per backend across production, independent
+   pure-Dart writer, and high-ECC profiles; 6,144 malformed C-ABI cases under
+   ASan/UBSan. See `test/SYNTHETIC_CORPUS.md`.
+6. Consumed by Telosnex `PairingCodeReader`/`PairingCodeRenderer` adapters;
+   adapter acceptance adds parity against platform decoders on real devices.

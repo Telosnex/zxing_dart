@@ -7,3 +7,8 @@
   device/simulator, macOS arm64/x64, Linux arm64/x64, Windows x64, and web.
 - Add native, VM, Chrome dart2js, Chrome dart2wasm, Safari, iOS Simulator,
   Android emulator, Linux container, and Windows/Wine conformance gates.
+- Add deterministic synthetic camera corpus v1: 40 stable recipes and 60
+  decode tasks per backend across zxing-cpp, an independent pure-Dart Aztec
+  writer, and a compact high-ECC symbol.
+- Add 6,144 deterministic malformed frame/descriptor ABI cases and an
+  AddressSanitizer/UndefinedBehaviorSanitizer gate.
