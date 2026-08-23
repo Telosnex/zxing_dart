@@ -33,6 +33,6 @@ final class _UnsupportedBackend implements ZxingBackend {
   @override
   Future<BarcodeMatrix> encodeAztec(
     Uint8List asciiPayload, {
-    required int eccLevel,
+    required int errorCorrectionPercent,
   }) => throw const ZxingException(4, 'Unsupported platform');
 }

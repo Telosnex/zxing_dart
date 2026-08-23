@@ -14,10 +14,10 @@ option(ZXD_BUILD_TESTS "Build native conformance/smoke tests" OFF)
 # shared lib so the shipped artifact is a single binary.
 set(BUILD_SHARED_LIBS OFF)
 set(ZXING_READERS ON)
-# Preserve this package's documented Aztec ECC 0..8 behavior. v3's new
-# zint-backed writer has percentage/string ECC semantics; the retained classic
-# writer is the compatible API while the reader receives all 3.1.1 changes.
-set(ZXING_WRITERS OLD)
+# This package is unreleased: adopt 3.1.1's production zint-backed writer and
+# percentage error-correction semantics now, before a deprecated API escapes.
+set(ZXING_WRITERS NEW)
+set(ZXING_USE_BUNDLED_ZINT ON)
 set(ZXING_C_API OFF)
 set(ZXING_EXAMPLES OFF)
 set(ZXING_UNIT_TESTS OFF)

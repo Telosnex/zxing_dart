@@ -22,8 +22,8 @@ void main() {
 
     expect(identical(first, second), isTrue);
     expect(first.runtime, expectedRuntime);
-    expect(first.abiVersion, 1);
-    expect(first.buildInfo, 'zxing_dart ABI 1; zxing-cpp 3.1.1');
+    expect(first.abiVersion, 2);
+    expect(first.buildInfo, 'zxing_dart ABI 2; zxing-cpp 3.1.1; zint 2.16.0');
     expect(first.canReadBarcodes, isTrue);
     expect(first.canEncodeAztec, isTrue);
   });
@@ -34,12 +34,10 @@ void main() {
     expect((matrix.width, matrix.height), (41, 41));
     expect(matrix.rowStride, 6);
     expect(matrix.bits.length, matrix.rowStride * matrix.height);
-    // Locks the renderer-facing modules across the 2.3.0 -> 3.1.1 upgrade.
-    // The classic writer is deliberate until a versioned API can express the
-    // new zint-backed writer's different ECC semantics.
+    // Pin the public renderer output of zxing-cpp 3.1.1 + zint 2.16.0.
     expect(
       sha256.convert(matrix.bits).toString(),
-      'bd57bfd2509940860a3303b52b09e00cd7c8d3446938656e7e7cc15a428a24c2',
+      '19a061412d2dba9d524030cfb3077eb5d48da09d4956b4cb739d51c670b6d70c',
     );
     expect(() => matrix.bits[0] = 0, throwsUnsupportedError);
     // Aztec's central bullseye is dark at the exact center.
@@ -115,7 +113,9 @@ void main() {
       for (var index = 0; index < 12; index++) 'tnx2:item-$index',
     ];
     final matrices = await Future.wait(
-      payloads.map((payload) => ZxingDart.encodeAztec(payload, eccLevel: 8)),
+      payloads.map(
+        (payload) => ZxingDart.encodeAztec(payload, errorCorrectionPercent: 50),
+      ),
     );
     final results = await Future.wait([
       for (var index = 0; index < matrices.length; index++)
@@ -123,6 +123,40 @@ void main() {
     ]);
 
     expect([for (final result in results) result!.text], payloads);
+  });
+
+  test('Aztec error-correction percentages map to zint levels', () async {
+    const payload = 'tnx2:ecc-percent-boundaries';
+    for (final (requested, canonical) in const [
+      (0, 10),
+      (16, 10),
+      (17, 23),
+      (29, 23),
+      (30, 36),
+      (43, 36),
+      (44, 50),
+      (99, 50),
+    ]) {
+      final actual = await ZxingDart.encodeAztec(
+        payload,
+        errorCorrectionPercent: requested,
+      );
+      final expected = await ZxingDart.encodeAztec(
+        payload,
+        errorCorrectionPercent: canonical,
+      );
+      expect(
+        actual.width,
+        expected.width,
+        reason: '$requested% -> $canonical%',
+      );
+      expect(
+        actual.height,
+        expected.height,
+        reason: '$requested% -> $canonical%',
+      );
+      expect(actual.bits, expected.bits, reason: '$requested% -> $canonical%');
+    }
   });
 
   test('validates all frame geometry before crossing FFI', () {
@@ -164,11 +198,11 @@ void main() {
     expect(() => ZxingDart.encodeAztec('tnx2:\u0000'), throwsArgumentError);
     expect(() => ZxingDart.encodeAztec('tnx2:é'), throwsArgumentError);
     expect(
-      () => ZxingDart.encodeAztec('tnx2:ok', eccLevel: -2),
+      () => ZxingDart.encodeAztec('tnx2:ok', errorCorrectionPercent: -1),
       throwsArgumentError,
     );
     expect(
-      () => ZxingDart.encodeAztec('tnx2:ok', eccLevel: 9),
+      () => ZxingDart.encodeAztec('tnx2:ok', errorCorrectionPercent: 100),
       throwsArgumentError,
     );
   });

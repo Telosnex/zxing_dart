@@ -54,7 +54,7 @@ enum BarcodePixelFormat {
 /// Barcode symbologies currently exposed by the stable Dart API.
 enum BarcodeFormat {
   aztec(1),
-  qrCode(1 << 13);
+  qrCode(1 << 1);
 
   const BarcodeFormat(this.nativeValue);
 

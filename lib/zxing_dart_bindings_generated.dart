@@ -58,7 +58,8 @@ external void zxd_read_result_release(ffi.Pointer<zxd_read_result> result);
 /// pairing payload is `<prefix>:<base64url>` so that every
 /// decoder in the fallback chain (Apple Vision, ML Kit, zxing)
 /// round-trips it byte-exactly.
-/// ecc_level    0..8 (zxing-cpp convention), or -1 for the library default.
+/// error_correction_percent  0..99, mapped by zxing-cpp/zint to the closest
+/// supported Aztec level (10/23/36/50), or -1 for its default.
 /// out          caller-allocated; zeroed on entry. On ZXD_OK caller owns
 /// `bits` and must call zxd_matrix_release (or free from Dart).
 @ffi.Native<
@@ -72,7 +73,7 @@ external void zxd_read_result_release(ffi.Pointer<zxd_read_result> result);
 external int zxd_encode_aztec(
   ffi.Pointer<ffi.Uint8> payload,
   int payload_length,
-  int ecc_level,
+  int error_correction_percent,
   ffi.Pointer<zxd_matrix> out,
 );
 
@@ -106,7 +107,7 @@ final class zxd_read_result extends ffi.Struct {
   /// `bytes`. May be NULL.
   external ffi.Pointer<ffi.Char> text;
 
-  /// ZXing::BarcodeFormat value of the decoded symbol.
+  /// Stable ZXD_FORMAT_* value of the decoded symbol (not an upstream enum).
   @ffi.Int32()
   external int format;
 
@@ -139,7 +140,7 @@ final class zxd_matrix extends ffi.Struct {
   external int height;
 }
 
-const int ZXD_ABI_VERSION = 1;
+const int ZXD_ABI_VERSION = 2;
 
 const int ZXD_OK = 0;
 
@@ -161,4 +162,4 @@ const int ZXD_FORMAT_ANY = 0;
 
 const int ZXD_FORMAT_AZTEC = 1;
 
-const int ZXD_FORMAT_QR_CODE = 8192;
+const int ZXD_FORMAT_QR_CODE = 2;

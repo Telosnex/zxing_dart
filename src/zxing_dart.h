@@ -27,7 +27,7 @@ extern "C" {
 #define ZXD_EXPORT __attribute__((visibility("default")))
 #endif
 
-#define ZXD_ABI_VERSION 1
+#define ZXD_ABI_VERSION 2
 
 // ---------------------------------------------------------------------------
 // Status codes (returned as int32_t).
@@ -46,13 +46,12 @@ extern "C" {
 #define ZXD_PIXEL_BGRA8888 2 // 4 bytes/px, B first in memory.
 
 // ---------------------------------------------------------------------------
-// Stable barcode format flags. These preserve zxing-cpp 2.x's public bit
-// values, but the shim explicitly translates them to/from the pinned upstream
-// representation. zxing-cpp 3.x no longer uses bit flags internally.
+// Package-owned barcode format flags. Deliberately independent of zxing-cpp's
+// internal ISO symbology IDs.
 // ---------------------------------------------------------------------------
 #define ZXD_FORMAT_ANY 0 // mask 0 == let zxing-cpp try all formats
 #define ZXD_FORMAT_AZTEC (1 << 0)
-#define ZXD_FORMAT_QR_CODE (1 << 13)
+#define ZXD_FORMAT_QR_CODE (1 << 1)
 
 // ---------------------------------------------------------------------------
 // zxd_read: decode one barcode from a pixel buffer.
@@ -130,13 +129,14 @@ typedef struct zxd_matrix {
 //                pairing payload is `<prefix>:<base64url>` so that every
 //                decoder in the fallback chain (Apple Vision, ML Kit, zxing)
 //                round-trips it byte-exactly.
-//   ecc_level    0..8 (zxing-cpp convention), or -1 for the library default.
+//   error_correction_percent  0..99, mapped by zxing-cpp/zint to the closest
+//                supported Aztec level (10/23/36/50), or -1 for its default.
 //   out          caller-allocated; zeroed on entry. On ZXD_OK caller owns
 //                `bits` and must call zxd_matrix_release (or free from Dart).
 ZXD_EXPORT int32_t zxd_encode_aztec(
     const uint8_t* payload,
     uint32_t payload_length,
-    int32_t ecc_level,
+    int32_t error_correction_percent,
     zxd_matrix* out) ZXD_NOEXCEPT;
 
 // Frees `matrix->bits` (NOT `matrix` itself) and zeroes the struct. Safe to

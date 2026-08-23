@@ -12,7 +12,8 @@
   writer, a compact high-ECC symbol, and a QR format-translation bridge.
 - Add 6,144 deterministic malformed frame/descriptor ABI cases and an
   AddressSanitizer/UndefinedBehaviorSanitizer gate.
-- Upgrade zxing-cpp from 2.3.0 to 3.1.1. Preserve ABI v1 by explicitly
-  translating its stable format flags to/from upstream's new ISO symbology IDs.
+- Upgrade zxing-cpp from 2.3.0 to 3.1.1 and adopt its bundled zint 2.16.0
+  production writer. ABI 2 uses package-owned format flags and percentage-based
+  Aztec error correction rather than preserving unreleased legacy semantics.
 - Move native compilation to C++20. Preserve Linux glibc 2.31 using pinned GCC
   12-on-bullseye images; use pinned MinGW GCC 12 for Windows.

@@ -8,7 +8,7 @@ import '../web_config.dart';
 import 'backend.dart';
 
 /// Must match ZXD_ABI_VERSION and zxing_dart_loader.mjs.
-const _abiVersion = 1;
+const _abiVersion = 2;
 
 const _flutterAssetWorkerUrl =
     'assets/packages/zxing_dart/web/zxing_dart_worker.mjs';
@@ -101,9 +101,12 @@ final class _WebPoolBackend implements ZxingBackend {
   @override
   Future<BarcodeMatrix> encodeAztec(
     Uint8List asciiPayload, {
-    required int eccLevel,
+    required int errorCorrectionPercent,
   }) => _enqueue(
-    (worker) => worker.encodeAztec(asciiPayload, eccLevel: eccLevel),
+    (worker) => worker.encodeAztec(
+      asciiPayload,
+      errorCorrectionPercent: errorCorrectionPercent,
+    ),
   );
 
   Future<T> _enqueue<T>(
@@ -315,7 +318,7 @@ final class _WebWorkerBackend implements ZxingBackend {
   @override
   Future<BarcodeMatrix> encodeAztec(
     Uint8List asciiPayload, {
-    required int eccLevel,
+    required int errorCorrectionPercent,
   }) async {
     final buffer = _transferableBuffer(asciiPayload);
     final result = _MatrixResult.wrap(
@@ -324,7 +327,7 @@ final class _WebWorkerBackend implements ZxingBackend {
           id: id,
           operation: 'encodeAztec',
           payload: buffer,
-          eccLevel: eccLevel,
+          errorCorrectionPercent: errorCorrectionPercent,
         ),
         transfer: buffer,
       ),
@@ -475,7 +478,7 @@ extension type _WorkerRequest._(JSObject _) implements JSObject {
     int pixelFormat,
     int formatsMask,
     bool tryHarder,
-    int eccLevel,
+    int errorCorrectionPercent,
   });
 }
 

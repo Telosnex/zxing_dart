@@ -84,17 +84,23 @@ abstract final class ZxingDart {
 
   /// Encodes printable ASCII as an Aztec module matrix.
   ///
-  /// [eccLevel] follows zxing-cpp's Aztec writer convention: -1 selects its
-  /// default, otherwise use 0 through 8. Pairing payloads should be a canonical
-  /// ASCII envelope such as `tnx2:<base64url>` rather than arbitrary binary, so
-  /// fallback platform decoders round-trip the same content.
+  /// [errorCorrectionPercent] is mapped by zxing-cpp's zint writer to the
+  /// closest supported Aztec level: 10%, 23%, 36%, or 50%. Null selects zint's
+  /// default. Pairing payloads should be a canonical ASCII envelope such as
+  /// `tnx2:<base64url>` rather than arbitrary binary, so fallback platform
+  /// decoders round-trip the same content.
   static Future<BarcodeMatrix> encodeAztec(
     String payload, {
-    int eccLevel = -1,
+    int? errorCorrectionPercent,
   }) async {
     if (payload.isEmpty) throw ArgumentError.value(payload, 'payload');
-    if (eccLevel < -1 || eccLevel > 8) {
-      throw ArgumentError.value(eccLevel, 'eccLevel', 'must be -1 or 0..8');
+    if (errorCorrectionPercent != null &&
+        (errorCorrectionPercent < 0 || errorCorrectionPercent > 99)) {
+      throw ArgumentError.value(
+        errorCorrectionPercent,
+        'errorCorrectionPercent',
+        'must be null or 0..99',
+      );
     }
     for (final codeUnit in payload.codeUnits) {
       if (codeUnit < 0x20 || codeUnit > 0x7e) {
@@ -107,7 +113,10 @@ abstract final class ZxingDart {
     }
     final bytes = Uint8List.fromList(ascii.encode(payload));
     _validateUint32(bytes.length, 'payload.length');
-    return (await _getBackend()).encodeAztec(bytes, eccLevel: eccLevel);
+    return (await _getBackend()).encodeAztec(
+      bytes,
+      errorCorrectionPercent: errorCorrectionPercent ?? -1,
+    );
   }
 
   static void _validateFrame(

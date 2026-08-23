@@ -6,7 +6,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="${1:-}"
-profile_version=4
+profile_version=5
 android_api="${ZXD_ANDROID_API:-24}"
 
 usage() {
@@ -334,7 +334,7 @@ if ! diff -u "$expected_exports" "$build_dir/actual_exports.txt"; then
   exit 1
 fi
 
-strings "$artifact" | grep 'zxing_dart ABI 1; zxing-cpp 3.1.1' >/dev/null || {
+strings "$artifact" | grep 'zxing_dart ABI 2; zxing-cpp 3.1.1; zint 2.16.0' >/dev/null || {
   echo 'Artifact build-info string is missing or unexpected.' >&2
   exit 1
 }

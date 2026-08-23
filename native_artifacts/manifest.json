@@ -1,8 +1,9 @@
 {
   "schema": 1,
-  "profile": 4,
+  "profile": 5,
   "sources": {
-    "zxing-cpp": "287c85df6f961c8efbfb5ffd736cd9457b8b890e"
+    "zxing-cpp": "287c85df6f961c8efbfb5ffd736cd9457b8b890e",
+    "zint": "55541e139e62b9209b71cd9b0ba9010cec28b1d9"
   },
   "toolchains": {
     "apple": "Xcode 26, Apple clang 17.0.0",
@@ -14,65 +15,65 @@
   "web": {
     "loader": {
       "path": "lib/web/zxing_dart_loader.mjs",
-      "sha256": "1aa70755fc2573c3b278386b9cefd5fa6aa880b3958d279f8ffe49ebe357b7ac"
+      "sha256": "0b6dbcabe39a0ec7812a093b357ffe61b9cf291d55d4d5fd0d75816a28c9f151"
     },
     "worker": {
       "path": "lib/web/zxing_dart_worker.mjs",
-      "sha256": "cdaa098e4a623f9a28cb1b27cd3c5134a789dc7bfe229c4fb5c9cd56173eada6"
+      "sha256": "a3f5b81927a5af065c439d01bd7953e00ce3ef544a7dd5476f4d44f5e9569318"
     },
     "module": {
       "path": "lib/web/zxing_dart_module.mjs",
-      "sha256": "83fd7a5e78af4b2222da9ee51270ea0723a45f180501426fccc05aebc93e13b8"
+      "sha256": "b72177213f7c496a8933ce3f51ec18b586e30376fd186a67d75486dd8f170898"
     },
     "wasm": {
       "path": "lib/web/zxing_dart_module.wasm",
-      "sha256": "ff1f2d98b1ac85b22df85e6ea578c6aead8afba0606e8c2397bc098a159f4851"
+      "sha256": "ff2de858491cd0fb718253927ba74bb0346d1dc72ec88ba3b9522f41e26df3fe"
     }
   },
   "artifacts": {
     "macos-arm64": {
       "path": "macos-arm64/libzxing_dart.dylib",
-      "sha256": "edaebf613fb8ce9094ecf8c0476576fa58b87b54c52201c368e36fbb0e5b5b24"
+      "sha256": "2ddf922675a7b4b59df37c0357c6f9a03cd3c6d77e66c80dec01153d2ab53083"
     },
     "macos-x64": {
       "path": "macos-x64/libzxing_dart.dylib",
-      "sha256": "6c9278ce2e9fb8d00ec741cdaa4184aa6c9fe78e17924cddf7dd7b7b6ac6d039"
+      "sha256": "c2f461c663eab7d2c8bb5964f32da2becafe520062ff1c630abe909cdd418717"
     },
     "ios-arm64-iphoneos": {
       "path": "ios-arm64-iphoneos/libzxing_dart.dylib",
-      "sha256": "4b3372d5d50a6f2a2d097ed37d45bea51e532b6c7b0c9ea35053a66cee0e4695"
+      "sha256": "8452cb1df0f70567eaa73dac9500a9e14adc81adebeb9fe06d6aaf22a44616c1"
     },
     "ios-arm64-iphonesimulator": {
       "path": "ios-arm64-iphonesimulator/libzxing_dart.dylib",
-      "sha256": "12af8774185d43292598421593055b79f38ef3c8c3fdef66729001521a4537fa"
+      "sha256": "3884400b8acd3aa4514363f1ad11989ea2b6bd22c1fb9fda2db6e683d35e7325"
     },
     "ios-x64-iphonesimulator": {
       "path": "ios-x64-iphonesimulator/libzxing_dart.dylib",
-      "sha256": "1a0485ddc4471b3cd5d4b0d4dc819c34b0724b1cf7aca414852ceeaa6fda00e9"
+      "sha256": "fbbbde46665a1dd6eae285683286c406a4646242d2b40c75add909ec16e02942"
     },
     "android-arm": {
       "path": "android-arm/libzxing_dart.so",
-      "sha256": "ae8f07033364f048ab6427e252247613432d6834b83cee1048fc0c48211182ca"
+      "sha256": "218f6e1e8b2436b26b737f95d51ecb648c7dca13b2ff9f2646812f2f8b439daa"
     },
     "android-arm64": {
       "path": "android-arm64/libzxing_dart.so",
-      "sha256": "75b9f109fcbb3c44045ce99c7d3cc882ea78656c4fc57f1bb4222ef517e992c6"
+      "sha256": "94027f6a3757daabe2ea3f6e7c73909382e8ac8c7465faf452eac6af990db9fd"
     },
     "android-x64": {
       "path": "android-x64/libzxing_dart.so",
-      "sha256": "c29f0e291aa30f0f903f2603a5ccaae897e33c8bc8d9b1f5396a5970719b8a17"
+      "sha256": "c8ee68f38df80d4bb386b48dcfe00d070b56fe3cf729ed41052961a6b0eb39aa"
     },
     "linux-arm64": {
       "path": "linux-arm64/libzxing_dart.so",
-      "sha256": "3709d7e991cd6ff9788d6400f94df20cee9fe2cb2a09b1876975b2526ffd44b9"
+      "sha256": "9ba19fa0cfaf7913de18daa19c671596015788c4940c573384c457e99bf9c1c1"
     },
     "linux-x64": {
       "path": "linux-x64/libzxing_dart.so",
-      "sha256": "300f776be44e7ca133717a66acffa82a7a03cdd3a0b13d4bac7cd6407d40569c"
+      "sha256": "74ff39cc088e99e0c8bef0518e11bdd4b62c1fd2a591bafcc7eb4fd7c3018f84"
     },
     "windows-x64": {
       "path": "windows-x64/zxing_dart.dll",
-      "sha256": "a8b54d40ace4a0d33e878fc619329bf327d9d747c3a6623c8c89646b51313d86"
+      "sha256": "e234d2452e6726ca13f31d93f594b32b3ef083b86bdb7a7dcb3bc65ce4156394"
     }
   }
 }

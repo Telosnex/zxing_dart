@@ -8,18 +8,16 @@ symbol—not a directory of opaque screenshots.
 The suite has four independently useful source profiles:
 
 1. **Production writer:** the full 119-byte `tnx2:` pairing envelope encoded by
-   pinned zxing-cpp at default ECC.
+   pinned zxing-cpp/zint at default ECC.
 2. **Independent writer:** the same envelope encoded by the separately pinned
    pure-Dart `barcode` 2.2.9 Aztec implementation, then decoded by zxing-cpp.
-   The two implementations currently produce bit-identical canonical modules;
-   the important independence is that the second matrix never calls our C ABI
-   writer.
-3. **Compact/high-ECC:** a short envelope encoded at ECC level 8, proving that
-   transform behavior is not accidentally specific to the 41×41 production
-   matrix.
+   Its matrix never calls our C ABI or bundled zint writer.
+3. **Compact/high-ECC:** a short envelope encoded by zint at 50% error
+   correction, proving that transform behavior is not accidentally specific to
+   the 41×41 production matrix.
 4. **QR format bridge:** an independently encoded QR symbol through 10 hard
-   transforms, locking ABI v1's QR bit flag across zxing-cpp 3.x's incompatible
-   internal format-ID redesign.
+   transforms, locking the package-owned QR flag across zxing-cpp 3.x's
+   incompatible internal format-ID redesign.
 
 Every positive result must be byte-exact, text-exact, report the expected
 symbology, and have nondegenerate in-frame geometry centered on the rendered

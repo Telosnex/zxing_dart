@@ -56,6 +56,7 @@ Documented in `src/zxing_dart.h`; highlights:
 | Component | Version | License | Pin |
 |---|---|---|---|
 | zxing-cpp | v3.1.1 | Apache-2.0 | `287c85df6f961c8efbfb5ffd736cd9457b8b890e` |
+| zint writer | v2.16.0 | BSD-3-Clause | `55541e139e62b9209b71cd9b0ba9010cec28b1d9` |
 | dart_alloc.h | flutter_zxing 2.3.0 | MIT | adapted, attributed in-file |
 | `barcode` test oracle | 2.2.9 | Apache-2.0 | exact dev-dependency pin |
 
@@ -115,7 +116,7 @@ Web calls use the same C ABI compiled with Emscripten. Each Wasm runtime lives
 in a module Worker; a bounded pool serializes one operation per runtime,
 transfers private call-time snapshots, routes responses by request ID, and
 replaces a Worker that crashes without replaying the failed operation. No CDN
-or platform barcode service is used. The 1.2 MiB Wasm binary and its loader are
+or platform barcode service is used. The 1.3 MiB Wasm binary and its loader are
 committed package assets with hashes in `native_artifacts/manifest.json`.
 
 ## Milestones

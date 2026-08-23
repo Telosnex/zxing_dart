@@ -18,6 +18,6 @@ abstract interface class ZxingBackend {
 
   Future<BarcodeMatrix> encodeAztec(
     Uint8List asciiPayload, {
-    required int eccLevel,
+    required int errorCorrectionPercent,
   });
 }

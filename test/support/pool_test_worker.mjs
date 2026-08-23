@@ -16,7 +16,7 @@ self.onmessage = ({data}) => {
     self.postMessage({
       id,
       result: {
-        abiVersion: 1,
+        abiVersion: 2,
         buildInfo: 'zxing_dart pool test Worker',
       },
     });

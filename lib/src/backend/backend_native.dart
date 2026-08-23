@@ -68,8 +68,10 @@ final class _NativeBackend implements ZxingBackend {
   @override
   Future<BarcodeMatrix> encodeAztec(
     Uint8List asciiPayload, {
-    required int eccLevel,
-  }) => Isolate.run(() => _encodeOnHelperIsolate(asciiPayload, eccLevel));
+    required int errorCorrectionPercent,
+  }) => Isolate.run(
+    () => _encodeOnHelperIsolate(asciiPayload, errorCorrectionPercent),
+  );
 }
 
 BarcodeResult? _readOnHelperIsolate(
@@ -131,7 +133,10 @@ BarcodeResult? _readOnHelperIsolate(
   }
 }
 
-BarcodeMatrix _encodeOnHelperIsolate(Uint8List asciiPayload, int eccLevel) {
+BarcodeMatrix _encodeOnHelperIsolate(
+  Uint8List asciiPayload,
+  int errorCorrectionPercent,
+) {
   final input = malloc<Uint8>(asciiPayload.length);
   final output = calloc<native.zxd_matrix>();
   try {
@@ -139,7 +144,7 @@ BarcodeMatrix _encodeOnHelperIsolate(Uint8List asciiPayload, int eccLevel) {
     final status = native.zxd_encode_aztec(
       input,
       asciiPayload.length,
-      eccLevel,
+      errorCorrectionPercent,
       output,
     );
     _throwForStatus(status, operation: 'encode Aztec');

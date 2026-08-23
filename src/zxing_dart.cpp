@@ -8,8 +8,7 @@
 #include "dart_alloc.h"
 
 // zxing-cpp (pinned; see tool/fetch_zxing.sh)
-#include "BitMatrix.h"
-#include "MultiFormatWriter.h"
+#include "CreateBarcode.h"
 #include "ReadBarcode.h"
 #include "Version.h"
 
@@ -40,11 +39,9 @@ uint32_t bytesPerPixel(ZXing::ImageFormat format) noexcept
     return format == ZXing::ImageFormat::Lum ? 1u : 4u;
 }
 
-// zxing-cpp 3.x replaced its historical bit-flag BarcodeFormat enum with ISO
-// symbology/variant IDs. The C ABI intentionally keeps the v1 bit values, so
-// never cast between these representations. This is the compatibility layer
-// that makes the "stable C ABI" claim real across upstream major versions.
-constexpr uint32_t kKnownFormatMask = (1u << 20) - 1;
+// Package-owned flags are intentionally smaller than and independent from
+// zxing-cpp's ISO symbology/variant IDs.
+constexpr uint32_t kKnownFormatMask = ZXD_FORMAT_AZTEC | ZXD_FORMAT_QR_CODE;
 
 ZXing::BarcodeFormats toZxingFormats(uint32_t mask)
 {
@@ -55,28 +52,8 @@ ZXing::BarcodeFormats toZxingFormats(uint32_t mask)
             formats.insert(formats.end(), values.begin(), values.end());
     };
 
-    add(1u << 0, {F::Aztec});
-    add(1u << 1, {F::Codabar});
-    add(1u << 2, {F::Code39});
-    add(1u << 3, {F::Code93});
-    add(1u << 4, {F::Code128});
-    add(1u << 5, {F::DataBarOmni, F::DataBarStk, F::DataBarStkOmni});
-    add(1u << 6, {F::DataBarExp, F::DataBarExpStk});
-    add(1u << 7, {F::DataMatrix});
-    add(1u << 8, {F::EAN8});
-    add(1u << 9, {F::EAN13});
-    add(1u << 10, {F::ITF});
-    add(1u << 11, {F::MaxiCode});
-    add(1u << 12, {F::PDF417, F::CompactPDF417});
-    // In 2.x QRCode excluded MicroQRCode and RMQRCode. Use explicit model
-    // variants rather than v3's broader QRCode symbology selector.
-    add(1u << 13, {F::QRCodeModel1, F::QRCodeModel2});
-    add(1u << 14, {F::UPCA});
-    add(1u << 15, {F::UPCE});
-    add(1u << 16, {F::MicroQRCode});
-    add(1u << 17, {F::RMQRCode});
-    add(1u << 18, {F::DXFilmEdge});
-    add(1u << 19, {F::DataBarLtd});
+    add(ZXD_FORMAT_AZTEC, {F::Aztec});
+    add(ZXD_FORMAT_QR_CODE, {F::QRCodeModel1, F::QRCodeModel2});
     return ZXing::BarcodeFormats(std::move(formats));
 }
 
@@ -86,41 +63,11 @@ int32_t fromZxingFormat(ZXing::BarcodeFormat format) noexcept
     switch (format) {
     case F::Aztec:
     case F::AztecCode:
-    case F::AztecRune: return 1 << 0;
-    case F::Codabar: return 1 << 1;
-    case F::Code39:
-    case F::Code39Std:
-    case F::Code39Ext:
-    case F::Code32:
-    case F::PZN: return 1 << 2;
-    case F::Code93: return 1 << 3;
-    case F::Code128: return 1 << 4;
-    case F::DataBar:
-    case F::DataBarOmni:
-    case F::DataBarStk:
-    case F::DataBarStkOmni: return 1 << 5;
-    case F::DataBarExp:
-    case F::DataBarExpStk: return 1 << 6;
-    case F::DataMatrix: return 1 << 7;
-    case F::EAN8: return 1 << 8;
-    case F::EAN13:
-    case F::ISBN: return 1 << 9;
-    case F::ITF:
-    case F::ITF14: return 1 << 10;
-    case F::MaxiCode: return 1 << 11;
-    case F::PDF417:
-    case F::CompactPDF417:
-    case F::MicroPDF417: return 1 << 12;
+    case F::AztecRune: return ZXD_FORMAT_AZTEC;
     case F::QRCode:
     case F::QRCodeModel1:
-    case F::QRCodeModel2: return 1 << 13;
-    case F::UPCA: return 1 << 14;
-    case F::UPCE: return 1 << 15;
-    case F::MicroQRCode: return 1 << 16;
-    case F::RMQRCode: return 1 << 17;
-    case F::DXFilmEdge: return 1 << 18;
-    case F::DataBarLtd: return 1 << 19;
-    default: return 0; // v3-only formats have no representation in ABI v1.
+    case F::QRCodeModel2: return ZXD_FORMAT_QR_CODE;
+    default: return ZXD_FORMAT_ANY;
     }
 }
 
@@ -135,7 +82,7 @@ int32_t zxd_abi_version(void) noexcept
 
 const char* zxd_build_info(void) noexcept
 {
-    return "zxing_dart ABI 1; zxing-cpp " ZXING_VERSION_STR;
+    return "zxing_dart ABI 2; zxing-cpp " ZXING_VERSION_STR "; zint 2.16.0";
 }
 
 int32_t zxd_read(
@@ -254,7 +201,7 @@ void zxd_read_result_release(zxd_read_result* result) noexcept
 int32_t zxd_encode_aztec(
     const uint8_t* payload,
     uint32_t payload_length,
-    int32_t ecc_level,
+    int32_t error_correction_percent,
     zxd_matrix* out) noexcept
 {
     if (out == nullptr) {
@@ -265,7 +212,7 @@ int32_t zxd_encode_aztec(
     if (payload == nullptr || payload_length == 0) {
         return ZXD_INVALID_ARGUMENT;
     }
-    if (ecc_level < -1 || ecc_level > 8) {
+    if (error_correction_percent < -1 || error_correction_percent > 99) {
         return ZXD_INVALID_ARGUMENT;
     }
     // Envelope contract: printable ASCII only (see header).
@@ -276,25 +223,19 @@ int32_t zxd_encode_aztec(
     }
 
     try {
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        // Deliberate compatibility choice; see ZXING_WRITERS=OLD in CMake.
-        ZXing::MultiFormatWriter writer(ZXing::BarcodeFormat::Aztec);
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-        // Margin is presentation; the embedder decides quiet-zone treatment.
-        writer.setMargin(0);
-        if (ecc_level >= 0) {
-            writer.setEccLevel(ecc_level);
-        }
-
         const std::string contents(reinterpret_cast<const char*>(payload), payload_length);
-        // width/height 0 => un-inflated matrix: exactly one cell per module.
-        const ZXing::BitMatrix matrix = writer.encode(contents, /*width=*/0, /*height=*/0);
-
+        std::string creatorOptions;
+        if (error_correction_percent >= 0) {
+            creatorOptions =
+                "ecLevel=" + std::to_string(error_correction_percent) + "%";
+        }
+        auto barcode = ZXing::CreateBarcodeFromText(
+            contents, ZXing::CreatorOptions(ZXing::BarcodeFormat::Aztec, creatorOptions));
+        if (!barcode.isValid()) {
+            return ZXD_ENCODE_ERROR;
+        }
+        // symbol() is zint's unscaled, quiet-zone-free module plane.
+        const ZXing::ImageView matrix = barcode.symbol();
         const int width = matrix.width();
         const int height = matrix.height();
         if (width <= 0 || height <= 0) {
@@ -308,7 +249,8 @@ int32_t zxd_encode_aztec(
         for (int y = 0; y < height; ++y) {
             uint8_t* row = out->bits + static_cast<size_t>(y) * rowStride;
             for (int x = 0; x < width; ++x) {
-                if (matrix.get(x, y)) {
+                // Barcode::symbol() is a luminance ImageView: zero is black.
+                if (*matrix.data(x, y) == 0) {
                     row[x >> 3] |= static_cast<uint8_t>(0x80u >> (x & 7));
                 }
             }

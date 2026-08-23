@@ -1,14 +1,15 @@
 # Pinned production artifacts
 
 Production code assets selected by `hook/build.dart`. Every native file is one
-self-contained shim library with zxing-cpp—and the applicable non-Apple C++
-runtime—statically folded in. Consumers do not invoke CMake, CocoaPods, Gradle
-native dependencies, a system zxing installation, or a CDN.
+self-contained shim library with zxing-cpp, its zint writer, and the applicable
+non-Apple C++ runtime statically folded in. Consumers do not invoke CMake,
+CocoaPods, Gradle native dependencies, a system installation, or a CDN.
 
 ## Source and toolchain pins
 
 - zxing-cpp `287c85df6f961c8efbfb5ffd736cd9457b8b890e` (`v3.1.1`)
-- native build profile `4`
+- zint `55541e139e62b9209b71cd9b0ba9010cec28b1d9` (`v2.16.0`, bundled writer)
+- native build profile `5`
 - Apple: Xcode 26 / Apple clang 17; macOS 12, iOS 13
 - Android: NDK `28.2.13676358`, API 24, static libc++, 16KB page alignment
 - Linux: pinned GCC 12.3-on-bullseye, glibc 2.31, static libstdc++/libgcc
@@ -19,26 +20,26 @@ native dependencies, a system zxing installation, or a CDN.
 Artifacts expose only the six `zxd_*` C ABI symbols. Upstream C++ symbols are
 hidden by an exported-symbol list (Apple), ELF version script (Android/Linux),
 or module definition file (Windows).
-Licenses and notices are under `licenses/`, including LLVM/libc++ for Android,
-GCC 12's GPLv3 text and Runtime Library Exception, and MinGW notices for
-statically linked Linux/Windows runtime components.
+Licenses and notices are under `licenses/`, including zint's backend BSD terms,
+LLVM/libc++ for Android, GCC 12's GPLv3 text and Runtime Library Exception, and
+MinGW notices for statically linked Linux/Windows runtime components.
 
 ## Complete intentional matrix
 
 | Target | Minimum | SHA-256 |
 |---|---:|---|
-| macOS arm64 | 12 | `edaebf613fb8ce9094ecf8c0476576fa58b87b54c52201c368e36fbb0e5b5b24` |
-| macOS x64 | 12 | `6c9278ce2e9fb8d00ec741cdaa4184aa6c9fe78e17924cddf7dd7b7b6ac6d039` |
-| iOS arm64 device | 13 | `4b3372d5d50a6f2a2d097ed37d45bea51e532b6c7b0c9ea35053a66cee0e4695` |
-| iOS arm64 simulator | 14¹ | `12af8774185d43292598421593055b79f38ef3c8c3fdef66729001521a4537fa` |
-| iOS x64 simulator | 13 | `1a0485ddc4471b3cd5d4b0d4dc819c34b0724b1cf7aca414852ceeaa6fda00e9` |
-| Android armv7 | API 24 | `ae8f07033364f048ab6427e252247613432d6834b83cee1048fc0c48211182ca` |
-| Android arm64 | API 24 | `75b9f109fcbb3c44045ce99c7d3cc882ea78656c4fc57f1bb4222ef517e992c6` |
-| Android x64 | API 24 | `c29f0e291aa30f0f903f2603a5ccaae897e33c8bc8d9b1f5396a5970719b8a17` |
-| Linux arm64 | glibc 2.31 baseline | `3709d7e991cd6ff9788d6400f94df20cee9fe2cb2a09b1876975b2526ffd44b9` |
-| Linux x64 | glibc 2.31 baseline | `300f776be44e7ca133717a66acffa82a7a03cdd3a0b13d4bac7cd6407d40569c` |
-| Windows x64 | MinGW/Win32 | `a8b54d40ace4a0d33e878fc619329bf327d9d747c3a6623c8c89646b51313d86` |
-| Browser Wasm | module Worker + Wasm | `ff1f2d98b1ac85b22df85e6ea578c6aead8afba0606e8c2397bc098a159f4851` |
+| macOS arm64 | 12 | `2ddf922675a7b4b59df37c0357c6f9a03cd3c6d77e66c80dec01153d2ab53083` |
+| macOS x64 | 12 | `c2f461c663eab7d2c8bb5964f32da2becafe520062ff1c630abe909cdd418717` |
+| iOS arm64 device | 13 | `8452cb1df0f70567eaa73dac9500a9e14adc81adebeb9fe06d6aaf22a44616c1` |
+| iOS arm64 simulator | 14¹ | `3884400b8acd3aa4514363f1ad11989ea2b6bd22c1fb9fda2db6e683d35e7325` |
+| iOS x64 simulator | 13 | `fbbbde46665a1dd6eae285683286c406a4646242d2b40c75add909ec16e02942` |
+| Android armv7 | API 24 | `218f6e1e8b2436b26b737f95d51ecb648c7dca13b2ff9f2646812f2f8b439daa` |
+| Android arm64 | API 24 | `94027f6a3757daabe2ea3f6e7c73909382e8ac8c7465faf452eac6af990db9fd` |
+| Android x64 | API 24 | `c8ee68f38df80d4bb386b48dcfe00d070b56fe3cf729ed41052961a6b0eb39aa` |
+| Linux arm64 | glibc 2.31 baseline | `9ba19fa0cfaf7913de18daa19c671596015788c4940c573384c457e99bf9c1c1` |
+| Linux x64 | glibc 2.31 baseline | `74ff39cc088e99e0c8bef0518e11bdd4b62c1fd2a591bafcc7eb4fd7c3018f84` |
+| Windows x64 | MinGW/Win32 | `e234d2452e6726ca13f31d93f594b32b3ef083b86bdb7a7dcb3bc65ce4156394` |
+| Browser Wasm | module Worker + Wasm | `ff2de858491cd0fb718253927ba74bb0346d1dc72ec88ba3b9522f41e26df3fe` |
 
 ¹ arm64 Simulator did not exist before iOS 14; x64 covers iOS 13 simulators.
 

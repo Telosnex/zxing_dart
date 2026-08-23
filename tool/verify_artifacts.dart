@@ -10,6 +10,14 @@ Future<void> main() async {
   if (manifest is! Map<String, Object?> || manifest['schema'] != 1) {
     throw const FormatException('Unsupported artifact manifest');
   }
+  final sources = manifest['sources'];
+  if (manifest['profile'] != 5 ||
+      sources is! Map<String, Object?> ||
+      sources.length != 2 ||
+      sources['zxing-cpp'] != '287c85df6f961c8efbfb5ffd736cd9457b8b890e' ||
+      sources['zint'] != '55541e139e62b9209b71cd9b0ba9010cec28b1d9') {
+    throw const FormatException('Unexpected production source/build profile');
+  }
 
   final checks = <({String label, File file, String expected})>[];
   final native = manifest['artifacts'];

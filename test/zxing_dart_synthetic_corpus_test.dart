@@ -140,7 +140,10 @@ void main() {
     'compact highest-ECC symbol survives the hard transform subset',
     () async {
       const payload = 'tnx2:short-high-ecc';
-      final matrix = await ZxingDart.encodeAztec(payload, eccLevel: 8);
+      final matrix = await ZxingDart.encodeAztec(
+        payload,
+        errorCorrectionPercent: 50,
+      );
       expect(matrix.width, lessThan(zxingMatrix.width));
       final corpus = buildHardTransformCorpus(matrix, expectedText: payload);
       expect(corpus, hasLength(10));
