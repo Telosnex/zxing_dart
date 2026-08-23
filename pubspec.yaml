@@ -19,3 +19,12 @@ dev_dependencies:
   ffigen: ^20.1.1
   lints: ^6.0.0
   test: ^1.28.0
+
+# Flutter serves these at assets/packages/zxing_dart/web/. Plain Dart browser
+# consumers serve lib/web/ themselves and configure ZxingDartWeb.workerUri.
+flutter:
+  assets:
+    - packages/zxing_dart/web/zxing_dart_worker.mjs
+    - packages/zxing_dart/web/zxing_dart_loader.mjs
+    - packages/zxing_dart/web/zxing_dart_module.mjs
+    - packages/zxing_dart/web/zxing_dart_module.wasm

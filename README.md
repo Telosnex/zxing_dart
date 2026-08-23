@@ -64,7 +64,9 @@ Pin bumps are reviewed changes accompanied by a full conformance run.
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
+tool/build_web.sh     # pinned Emscripten ES module + Wasm
 dart test             # verifies code-asset hash, ABI, Dart/FFI/isolate path
+tool/test_all.sh      # VM + Chrome dart2js + Chrome dart2wasm + Safari
 ```
 
 ## Dart API (milestone 2)
@@ -91,13 +93,21 @@ copied out of C-owned memory, made unmodifiable, and remain valid after the
 paired native release functions run. Frame geometry is checked in Dart and
 again in C using overflow-safe arithmetic.
 
+Web calls use the same C ABI compiled with Emscripten. Each Wasm runtime lives
+in a module Worker; a bounded pool serializes one operation per runtime,
+transfers private call-time snapshots, routes responses by request ID, and
+replaces a Worker that crashes without replaying the failed operation. No CDN
+or platform barcode service is used. The 1.0 MiB Wasm binary and its loader are
+committed package assets with hashes in `native_artifacts/manifest.json`.
+
 ## Milestones
 
 1. ✅ C ABI + macos-arm64 build + native ABI smoke test
 2. ✅ ffigen bindings, Dart facade, helper-isolate backend, pinned macOS code
    asset hook, immutable typed models, 10 Dart API/FFI/isolate tests
-3. Emscripten module + worker + loader (image_ffmpeg web protocol), parity
-   suite in Chrome dart2js / dart2wasm / Safari
+3. ✅ Emscripten module + worker pool + loader, deterministic pinned web
+   artifacts, VM/Chrome dart2js/Chrome dart2wasm/Safari parity suite, Worker
+   initialization/error/replacement tests
 4. Remaining native targets (android arm64/arm32/x64, ios, macos-x64) via the
    image_ffmpeg artifact matrix; committed artifacts + SHA-256 manifest +
    verifying build hook

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'backend/backend.dart';
 import 'backend/backend_stub.dart'
     if (dart.library.ffi) 'backend/backend_native.dart'
+    if (dart.library.js_interop) 'backend/backend_web.dart'
     as platform;
 import 'models.dart';
 

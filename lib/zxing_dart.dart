@@ -6,6 +6,7 @@
 library;
 
 export 'src/zxing.dart' show ZxingDart;
+export 'src/web_config.dart' show ZxingDartWeb;
 export 'src/models.dart'
     show
         BarcodeFormat,

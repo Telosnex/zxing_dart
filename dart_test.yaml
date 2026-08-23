@@ -1,0 +1,8 @@
+# package:test normally opens a local redirect file for Safari. Modern Safari
+# gates local-file navigation interactively; this wrapper opens only the parsed
+# loopback manager URL directly.
+override_platforms:
+  safari:
+    settings:
+      executable: /bin/bash
+      arguments: tool/safari_test_launcher.sh

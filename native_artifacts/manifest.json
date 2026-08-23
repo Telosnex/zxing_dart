@@ -5,7 +5,26 @@
     "zxing-cpp": "d6068bcebeb8fd9f0d35a99b00d202be86a14dbe"
   },
   "toolchains": {
-    "apple": "Xcode 26, Apple clang 17.0.0"
+    "apple": "Xcode 26, Apple clang 17.0.0",
+    "web": "Emscripten 5.0.0 a7c5deabd7c88ba1c38ebe988112256775f944c6"
+  },
+  "web": {
+    "loader": {
+      "path": "lib/web/zxing_dart_loader.mjs",
+      "sha256": "1aa70755fc2573c3b278386b9cefd5fa6aa880b3958d279f8ffe49ebe357b7ac"
+    },
+    "worker": {
+      "path": "lib/web/zxing_dart_worker.mjs",
+      "sha256": "cdaa098e4a623f9a28cb1b27cd3c5134a789dc7bfe229c4fb5c9cd56173eada6"
+    },
+    "module": {
+      "path": "lib/web/zxing_dart_module.mjs",
+      "sha256": "8a91890942681fe660217c805eba7113e04668f10d6b0c9c2ab0bae903541d0c"
+    },
+    "wasm": {
+      "path": "lib/web/zxing_dart_module.wasm",
+      "sha256": "6d05811c77c07eb044310e1c2871d964e78ca86268be1350679495c182b0e8fb"
+    }
   },
   "artifacts": {
     "macos-arm64": {

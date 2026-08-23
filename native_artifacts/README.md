@@ -18,6 +18,7 @@ used for Android. Licenses and notices are under `licenses/`.
 | Target | Minimum | SHA-256 |
 |---|---|---|
 | macOS arm64 | macOS 12 | `a5b32e65531030b2b2689431de03b1a62e1a419eeb743d26fe4ca485553884f7` |
+| Browser Wasm | modern module Worker + Wasm | `6d05811c77c07eb044310e1c2871d964e78ca86268be1350679495c182b0e8fb` |
 
 Android, iOS, and macOS x64 arrive with milestone 4. Linux and Windows are not
 target platforms. Unsupported tuples fail in the build hook rather than
@@ -27,8 +28,11 @@ silently using an unpinned library.
 
 ```bash
 tool/build_macos.sh
+tool/build_web.sh
+dart run tool/verify_artifacts.dart
 ```
 
-The script fetches and verifies the immutable source commit, runs the ABI-only
-native smoke test, verifies the complete exported-symbol set, copies the dylib
-here, and prints the SHA-256 recorded in `manifest.json`.
+The build scripts fetch and verify the immutable source commit. Native builds
+run the ABI-only smoke test and verify the complete exported-symbol set. Web
+builds are reproducible under the pinned Emscripten version. The verifier
+checks every committed native and web asset against `manifest.json`.

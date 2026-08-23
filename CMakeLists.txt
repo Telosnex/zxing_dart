@@ -2,7 +2,15 @@ cmake_minimum_required(VERSION 3.16)
 
 project(zxing_dart LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+# zxing-cpp v2.3.0 aliases char8_t to uint8_t under C++17. Current
+# Emscripten/libc++ intentionally has no std::char_traits<unsigned char>, while
+# C++20's real char8_t is supported. Native artifacts remain C++17; Wasm uses
+# C++20 solely for upstream compatibility.
+if(EMSCRIPTEN)
+  set(CMAKE_CXX_STANDARD 20)
+else()
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -21,7 +29,12 @@ if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/zxing-cpp/core/CMakeLists.
 endif()
 add_subdirectory(third_party/zxing-cpp/core EXCLUDE_FROM_ALL)
 
-add_library(zxing_dart SHARED src/zxing_dart.cpp)
+if(EMSCRIPTEN)
+  # tool/build_web.sh performs the final Emscripten ES-module link explicitly.
+  add_library(zxing_dart STATIC src/zxing_dart.cpp)
+else()
+  add_library(zxing_dart SHARED src/zxing_dart.cpp)
+endif()
 target_link_libraries(zxing_dart PRIVATE ZXing)
 set_target_properties(zxing_dart PROPERTIES
   CXX_VISIBILITY_PRESET hidden

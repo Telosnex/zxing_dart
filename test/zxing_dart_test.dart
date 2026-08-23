@@ -4,18 +4,23 @@ import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:zxing_dart/zxing_dart.dart';
 
+import 'support/platform_setup_stub.dart'
+    if (dart.library.js_interop) 'support/platform_setup_web.dart';
+
 const _pairingPayload =
     'tnx2:'
     'VGhpc0lzQU5vbmNlMTIzNDU2Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6'
     'QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo0OTg3NjU0MzIxMA';
 
 void main() {
-  test('capabilities load once and validate the pinned native asset', () async {
+  configureZxingTestPlatform();
+
+  test('capabilities load once and validate the pinned backend', () async {
     final first = await ZxingDart.capabilities;
     final second = await ZxingDart.capabilities;
 
     expect(identical(first, second), isTrue);
-    expect(first.runtime, ZxingRuntime.native);
+    expect(first.runtime, expectedRuntime);
     expect(first.abiVersion, 1);
     expect(first.buildInfo, 'zxing_dart ABI 1; zxing-cpp 2.3.0');
     expect(first.canReadBarcodes, isTrue);
