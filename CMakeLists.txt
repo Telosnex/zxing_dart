@@ -13,6 +13,9 @@ option(ZXD_BUILD_TESTS "Build native conformance/smoke tests" OFF)
 set(BUILD_SHARED_LIBS OFF)
 set(ZXING_READERS ON)
 set(ZXING_WRITERS ON)
+set(ZXING_C_API OFF)
+set(ZXING_EXAMPLES OFF)
+set(ZXING_UNIT_TESTS OFF)
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/zxing-cpp/core/CMakeLists.txt)
   message(FATAL_ERROR "zxing-cpp not found. Run: tool/fetch_zxing.sh")
 endif()
@@ -24,6 +27,15 @@ set_target_properties(zxing_dart PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   VISIBILITY_INLINES_HIDDEN ON
 )
+
+if(APPLE)
+  # Static archives retain their own symbol visibility when folded into a
+  # dylib. Export only our stable C ABI, never the hundreds of zxing-cpp C++
+  # implementation symbols.
+  target_link_options(zxing_dart PRIVATE
+    "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/src/exports_apple.txt"
+  )
+endif()
 
 if(ANDROID)
   find_library(log-lib log)

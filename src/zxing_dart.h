@@ -147,6 +147,10 @@ ZXD_EXPORT void zxd_matrix_release(zxd_matrix* matrix) ZXD_NOEXCEPT;
 // other call and refuses to run on mismatch.
 ZXD_EXPORT int32_t zxd_abi_version(void) ZXD_NOEXCEPT;
 
+// Returns a process-lifetime, NUL-terminated ASCII build description owned by
+// the library. The caller must not free it.
+ZXD_EXPORT const char* zxd_build_info(void) ZXD_NOEXCEPT;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

@@ -64,12 +64,38 @@ Pin bumps are reviewed changes accompanied by a full conformance run.
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
+dart test             # verifies code-asset hash, ABI, Dart/FFI/isolate path
 ```
+
+## Dart API (milestone 2)
+
+```dart
+final matrix = await ZxingDart.encodeAztec('tnx2:<base64url>');
+// Draw matrix.isDark(x, y) with a CustomPainter.
+
+final result = await ZxingDart.readBarcode(
+  cameraYPlane,
+  width: frameWidth,
+  height: frameHeight,
+  rowStride: cameraBytesPerRow,
+  // luminance8 + Aztec are the defaults.
+);
+if (result != null) {
+  print(result.text);
+  print(result.position.corners); // acquisition-overlay geometry
+}
+```
+
+Native calls run on helper isolates. Returned bytes and module matrices are
+copied out of C-owned memory, made unmodifiable, and remain valid after the
+paired native release functions run. Frame geometry is checked in Dart and
+again in C using overflow-safe arithmetic.
 
 ## Milestones
 
 1. ✅ C ABI + macos-arm64 build + native ABI smoke test
-2. ffigen bindings, Dart facade, helper-isolate backend (`backend_native.dart`)
+2. ✅ ffigen bindings, Dart facade, helper-isolate backend, pinned macOS code
+   asset hook, immutable typed models, 10 Dart API/FFI/isolate tests
 3. Emscripten module + worker + loader (image_ffmpeg web protocol), parity
    suite in Chrome dart2js / dart2wasm / Safari
 4. Remaining native targets (android arm64/arm32/x64, ios, macos-x64) via the

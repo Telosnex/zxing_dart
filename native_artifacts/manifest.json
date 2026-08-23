@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "profile": 1,
+  "sources": {
+    "zxing-cpp": "d6068bcebeb8fd9f0d35a99b00d202be86a14dbe"
+  },
+  "toolchains": {
+    "apple": "Xcode 26, Apple clang 17.0.0"
+  },
+  "artifacts": {
+    "macos-arm64": {
+      "path": "macos-arm64/libzxing_dart.dylib",
+      "sha256": "a5b32e65531030b2b2689431de03b1a62e1a419eeb743d26fe4ca485553884f7"
+    }
+  }
+}

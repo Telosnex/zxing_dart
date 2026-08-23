@@ -1,0 +1,15 @@
+# Run with `dart run ffigen --config ffigen.yaml`.
+name: ZxingDartBindings
+description: |
+  Generated bindings for the stable zxing_dart C ABI in src/zxing_dart.h.
+  Do not edit by hand.
+output: 'lib/zxing_dart_bindings_generated.dart'
+headers:
+  entry-points:
+    - 'src/zxing_dart.h'
+  include-directives:
+    - 'src/zxing_dart.h'
+ffi-native:
+comments:
+  style: any
+  length: full

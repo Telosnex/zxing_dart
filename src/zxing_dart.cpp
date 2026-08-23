@@ -11,6 +11,7 @@
 #include "BitMatrix.h"
 #include "MultiFormatWriter.h"
 #include "ReadBarcode.h"
+#include "Version.h"
 
 #include <cstring>
 #include <string>
@@ -43,6 +44,11 @@ extern "C" {
 int32_t zxd_abi_version(void) noexcept
 {
     return ZXD_ABI_VERSION;
+}
+
+const char* zxd_build_info(void) noexcept
+{
+    return "zxing_dart ABI 1; zxing-cpp " ZXING_VERSION_STR;
 }
 
 int32_t zxd_read(

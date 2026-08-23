@@ -1,0 +1,6 @@
+_zxd_abi_version
+_zxd_build_info
+_zxd_read
+_zxd_read_result_release
+_zxd_encode_aztec
+_zxd_matrix_release
