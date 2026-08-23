@@ -16,6 +16,23 @@ Future<void> main() async {
   if (native is! Map<String, Object?>) {
     throw const FormatException('Missing native artifacts');
   }
+  const expectedNativeTargets = {
+    'macos-arm64',
+    'macos-x64',
+    'ios-arm64-iphoneos',
+    'ios-arm64-iphonesimulator',
+    'ios-x64-iphonesimulator',
+    'android-arm',
+    'android-arm64',
+    'android-x64',
+  };
+  if (native.keys.toSet().difference(expectedNativeTargets).isNotEmpty ||
+      expectedNativeTargets.difference(native.keys.toSet()).isNotEmpty) {
+    throw FormatException(
+      'Native artifact matrix mismatch: expected $expectedNativeTargets, '
+      'found ${native.keys.toSet()}',
+    );
+  }
   for (final MapEntry(key: target, value: encoded) in native.entries) {
     if (encoded case {'path': final String path, 'sha256': final String hash}) {
       checks.add((
@@ -30,6 +47,14 @@ Future<void> main() async {
 
   final web = manifest['web'];
   if (web is! Map<String, Object?>) throw const FormatException('Missing web');
+  const expectedWebAssets = {'loader', 'worker', 'module', 'wasm'};
+  if (web.keys.toSet().difference(expectedWebAssets).isNotEmpty ||
+      expectedWebAssets.difference(web.keys.toSet()).isNotEmpty) {
+    throw FormatException(
+      'Web artifact matrix mismatch: expected $expectedWebAssets, '
+      'found ${web.keys.toSet()}',
+    );
+  }
   for (final MapEntry(key: name, value: encoded) in web.entries) {
     if (encoded case {'path': final String path, 'sha256': final String hash}) {
       checks.add((

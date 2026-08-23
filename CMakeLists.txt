@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.16)
 project(zxing_dart LANGUAGES CXX)
 
 # zxing-cpp v2.3.0 aliases char8_t to uint8_t under C++17. Current
-# Emscripten/libc++ intentionally has no std::char_traits<unsigned char>, while
-# C++20's real char8_t is supported. Native artifacts remain C++17; Wasm uses
-# C++20 solely for upstream compatibility.
-if(EMSCRIPTEN)
+# Emscripten/Android libc++ intentionally has no std::char_traits<unsigned
+# char>, while C++20's real char8_t is supported. Apple artifacts remain
+# C++17; Android/Wasm use C++20 solely for upstream compatibility.
+if(EMSCRIPTEN OR ANDROID)
   set(CMAKE_CXX_STANDARD 20)
 else()
   set(CMAKE_CXX_STANDARD 17)
@@ -48,13 +48,22 @@ if(APPLE)
   target_link_options(zxing_dart PRIVATE
     "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/src/exports_apple.txt"
   )
+  set_target_properties(zxing_dart PROPERTIES
+    BUILD_WITH_INSTALL_RPATH ON
+    INSTALL_NAME_DIR "@rpath"
+  )
 endif()
 
 if(ANDROID)
   find_library(log-lib log)
   target_link_libraries(zxing_dart PRIVATE ${log-lib})
   # 16KB page size support with NDK 27.x; default in NDK 28+.
-  target_link_options(zxing_dart PRIVATE "-Wl,-z,max-page-size=16384")
+  target_link_options(zxing_dart PRIVATE
+    "-Wl,-z,max-page-size=16384"
+    "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/src/exports_elf.map"
+    "-Wl,--exclude-libs,ALL"
+    "-Wl,-z,relro,-z,now"
+  )
 endif()
 
 if(ZXD_BUILD_TESTS)

@@ -6,6 +6,7 @@
   },
   "toolchains": {
     "apple": "Xcode 26, Apple clang 17.0.0",
+    "android": "Android NDK 28.2.13676358, API 24, libc++ static",
     "web": "Emscripten 5.0.0 a7c5deabd7c88ba1c38ebe988112256775f944c6"
   },
   "web": {
@@ -29,7 +30,35 @@
   "artifacts": {
     "macos-arm64": {
       "path": "macos-arm64/libzxing_dart.dylib",
-      "sha256": "a5b32e65531030b2b2689431de03b1a62e1a419eeb743d26fe4ca485553884f7"
+      "sha256": "1e270cbc35b5fd39b36a4cfc4790d371cb4c594b4665154cb2fbab9a5431d895"
+    },
+    "macos-x64": {
+      "path": "macos-x64/libzxing_dart.dylib",
+      "sha256": "d3bd9606f5fb720d50862763d05f04d5219d6435073e366b5cb26f8642519d9f"
+    },
+    "ios-arm64-iphoneos": {
+      "path": "ios-arm64-iphoneos/libzxing_dart.dylib",
+      "sha256": "0957bb83b02d8e82bfab1a63595900b68606536d4ec3af008ddda1ad2dae53bc"
+    },
+    "ios-arm64-iphonesimulator": {
+      "path": "ios-arm64-iphonesimulator/libzxing_dart.dylib",
+      "sha256": "a434546d8d781dfcc9e6460c54c69b396034d5bc01fa3548db2cb580daad952e"
+    },
+    "ios-x64-iphonesimulator": {
+      "path": "ios-x64-iphonesimulator/libzxing_dart.dylib",
+      "sha256": "3772bfb533e76da42be09185ce800923b91c73b33b809b15d30abbac1530bc08"
+    },
+    "android-arm": {
+      "path": "android-arm/libzxing_dart.so",
+      "sha256": "3b3501bb9120ff72fc1f5e78ade0791e74de544382805984493b5ae4bc8dec54"
+    },
+    "android-arm64": {
+      "path": "android-arm64/libzxing_dart.so",
+      "sha256": "bb311390877085e6c058a413d36ac260d23b134135b356226479588b9e3dbbac"
+    },
+    "android-x64": {
+      "path": "android-x64/libzxing_dart.so",
+      "sha256": "9fafd7d0ef35c7cd9781dc1b8460f8284efde63de109bb832e649675743b808d"
     }
   }
 }

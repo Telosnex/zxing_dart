@@ -1,0 +1,11 @@
+ZXING_DART_1 {
+  global:
+    zxd_abi_version;
+    zxd_build_info;
+    zxd_read;
+    zxd_read_result_release;
+    zxd_encode_aztec;
+    zxd_matrix_release;
+  local:
+    *;
+};
