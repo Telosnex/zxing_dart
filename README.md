@@ -1,0 +1,81 @@
+# zxing_dart
+
+A pinned [zxing-cpp](https://github.com/zxing-cpp/zxing-cpp) behind a small
+stable C ABI, with one universal Dart entrypoint. Native backends via FFI +
+committed, SHA-256-pinned artifacts; web backend via an Emscripten module and
+worker. Third application of the porting template documented in
+`image_ffmpeg/doc/PORTING_C_LIBRARIES.md` (after fllama and fonnx; this repo
+follows image_ffmpeg, the most refined iteration).
+
+Built for the Telosnex E2EE device-linking flow (Aztec pairing symbols), but
+deliberately generic: bytes-in/bytes-out, camera-agnostic, UI-free.
+
+## Why not an existing package?
+
+Evaluated in depth (see `../flutter_zxing_audit` while it exists):
+
+* `flutter_zxing` — validated the architecture; its `dart_alloc.h` allocator
+  discipline is adopted here (MIT, attributed in-file). Not consumable for a
+  security flow: no web, consumer-compiled submodule builds, documented
+  fork-breakage, hard camera/UI coupling, no row-stride support, 143 lines of
+  tests.
+* `mobile_scanner` — three different proprietary decoders (ML Kit / Vision /
+  BarcodeDetector) with per-platform behavior variance and a CDN-fetched WASM
+  fallback. Kept as a fallback adapter behind the app-side reader interface.
+
+## Layout
+
+```text
+src/zxing_dart.{h,cpp}   C ABI shim: zxd_read, zxd_encode_aztec, releases
+src/dart_alloc.h         Dart-VM-symmetric allocator (from flutter_zxing, MIT)
+native_test/             ABI-only C++ conformance tests (no zxing headers)
+tool/fetch_zxing.sh      pinned fetch (commit hash verified post-checkout)
+tool/build_macos.sh      milestone-1 build: macos-arm64 + smoke test
+lib/                     Dart facade (milestone 2)
+native_artifacts/        committed pinned binaries + manifest (milestone 4)
+```
+
+## ABI rules
+
+Documented in `src/zxing_dart.h`; highlights:
+
+* No exceptions cross the boundary; every fn returns a status `int32_t`.
+* All buffer claims bounds-checked in `uint64_t` before any pixel is read
+  (camera plane descriptors are treated as attacker-influenced).
+* Variable-size outputs allocated with `dart_allocator` so Dart's
+  `ffi.malloc.free` is always symmetric; every result has a paired,
+  double-call-safe `_release`.
+* Encode returns a bit-packed **module matrix**, not pixels: rendering is the
+  embedder's job (`CustomPainter` draws modules; visual styling stays outside
+  the codec).
+* Payloads are printable ASCII by contract (`tnx2:<base64url>` envelope) so
+  every decoder in the fallback chain round-trips byte-exactly.
+
+## Provenance
+
+| Component | Version | License | Pin |
+|---|---|---|---|
+| zxing-cpp | v2.3.0 | Apache-2.0 | `d6068bcebeb8fd9f0d35a99b00d202be86a14dbe` |
+| dart_alloc.h | flutter_zxing 2.3.0 | MIT | adapted, attributed in-file |
+
+Pin bumps are reviewed changes accompanied by a full conformance run.
+
+## Build & test (milestone 1)
+
+```bash
+tool/build_macos.sh   # fetch pin, build, run native smoke test
+```
+
+## Milestones
+
+1. ✅ C ABI + macos-arm64 build + native ABI smoke test
+2. ffigen bindings, Dart facade, helper-isolate backend (`backend_native.dart`)
+3. Emscripten module + worker + loader (image_ffmpeg web protocol), parity
+   suite in Chrome dart2js / dart2wasm / Safari
+4. Remaining native targets (android arm64/arm32/x64, ios, macos-x64) via the
+   image_ffmpeg artifact matrix; committed artifacts + SHA-256 manifest +
+   verifying build hook
+5. Conformance corpora: synthetic camera torture (rotation/blur/glare/moiré),
+   malformed-frame fuzzing at the shim boundary, cross-decoder parity
+   (this vs platform decoders vs pure-Dart `barcode` encoder)
+6. Consumed by Telosnex `PairingCodeReader`/`PairingCodeRenderer` adapters

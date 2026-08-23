@@ -1,0 +1,8 @@
+# Fetched by tool/fetch_zxing.sh at a pinned revision; never committed.
+third_party/
+
+build/
+.dart_tool/
+pubspec.lock
+.idea/
+*.iml
