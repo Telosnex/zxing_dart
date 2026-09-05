@@ -56,7 +56,7 @@ No minimum OS/API was raised: macOS 12, iOS 13 (arm64 simulator 14), Android API
 
 ## Gates
 
-- Exact six-symbol export surface and artifact hashes for all 11 native tuples
+- Exact seven-symbol export surface and artifact hashes for all 11 native tuples
 - 70 synthetic acquisition tasks per backend, including independent Aztec and
   QR writers and zint default/high-ECC output
 - 6,144 malformed C ABI cases under ASan + UBSan

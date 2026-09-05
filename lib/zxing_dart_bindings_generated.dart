@@ -77,6 +77,38 @@ external int zxd_encode_aztec(
   ffi.Pointer<zxd_matrix> out,
 );
 
+/// Encodes `payload` as a symbol of the single format named by `format`
+/// (one ZXD_FORMAT_* bit; masks with multiple bits are rejected).
+///
+/// Added in ABI 3.
+///
+/// format       ZXD_FORMAT_AZTEC or ZXD_FORMAT_DATA_MATRIX. QR is decode-only
+/// for now: no consumer needs QR writing, and an untested writer
+/// path is a liability, not a feature.
+/// error_correction_percent  Aztec: 0..99 or -1 (see zxd_encode_aztec).
+/// DataMatrix: must be -1. Its Reed-Solomon budget is fixed by
+/// symbol size; accepting a percentage here would silently lie.
+/// DataMatrix output is always square (zint forceSquare):
+/// rectangular DMRE sizes would break renderer aspect-ratio
+/// assumptions for some payload lengths.
+/// Other parameters and ownership are identical to zxd_encode_aztec.
+@ffi.Native<
+  ffi.Int32 Function(
+    ffi.Pointer<ffi.Uint8>,
+    ffi.Uint32,
+    ffi.Uint32,
+    ffi.Int32,
+    ffi.Pointer<zxd_matrix>,
+  )
+>()
+external int zxd_encode(
+  ffi.Pointer<ffi.Uint8> payload,
+  int payload_length,
+  int format,
+  int error_correction_percent,
+  ffi.Pointer<zxd_matrix> out,
+);
+
 /// Frees `matrix->bits` (NOT `matrix` itself) and zeroes the struct. Safe to
 /// call multiple times, and safe on a zeroed struct.
 @ffi.Native<ffi.Void Function(ffi.Pointer<zxd_matrix>)>()
@@ -140,7 +172,7 @@ final class zxd_matrix extends ffi.Struct {
   external int height;
 }
 
-const int ZXD_ABI_VERSION = 2;
+const int ZXD_ABI_VERSION = 3;
 
 const int ZXD_OK = 0;
 
@@ -163,3 +195,5 @@ const int ZXD_FORMAT_ANY = 0;
 const int ZXD_FORMAT_AZTEC = 1;
 
 const int ZXD_FORMAT_QR_CODE = 2;
+
+const int ZXD_FORMAT_DATA_MATRIX = 4;

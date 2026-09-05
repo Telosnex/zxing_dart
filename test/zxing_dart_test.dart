@@ -22,10 +22,11 @@ void main() {
 
     expect(identical(first, second), isTrue);
     expect(first.runtime, expectedRuntime);
-    expect(first.abiVersion, 2);
-    expect(first.buildInfo, 'zxing_dart ABI 2; zxing-cpp 3.1.1; zint 2.16.0');
+    expect(first.abiVersion, 3);
+    expect(first.buildInfo, 'zxing_dart ABI 3; zxing-cpp 3.1.1; zint 2.16.0');
     expect(first.canReadBarcodes, isTrue);
     expect(first.canEncodeAztec, isTrue);
+    expect(first.canEncodeDataMatrix, isTrue);
   });
 
   test('Aztec encode returns canonical painter-ready modules', () async {

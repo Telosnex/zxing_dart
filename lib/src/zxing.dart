@@ -119,6 +119,29 @@ abstract final class ZxingDart {
     );
   }
 
+  /// Encodes printable ASCII as a DataMatrix module matrix.
+  ///
+  /// DataMatrix has no tunable error-correction level: its Reed-Solomon
+  /// budget is fixed by the symbol size zint selects for the payload. The
+  /// same ASCII envelope contract as [encodeAztec] applies.
+  ///
+  /// Requires an ABI 3 backend with the generic `zxd_encode` export.
+  static Future<BarcodeMatrix> encodeDataMatrix(String payload) async {
+    if (payload.isEmpty) throw ArgumentError.value(payload, 'payload');
+    for (final codeUnit in payload.codeUnits) {
+      if (codeUnit < 0x20 || codeUnit > 0x7e) {
+        throw ArgumentError.value(
+          payload,
+          'payload',
+          'must contain printable ASCII only',
+        );
+      }
+    }
+    final bytes = Uint8List.fromList(ascii.encode(payload));
+    _validateUint32(bytes.length, 'payload.length');
+    return (await _getBackend()).encodeDataMatrix(bytes);
+  }
+
   static void _validateFrame(
     Uint8List pixels, {
     required int width,

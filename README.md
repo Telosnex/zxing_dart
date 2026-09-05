@@ -26,7 +26,7 @@ Evaluated in depth (see `../flutter_zxing_audit` while it exists):
 ## Layout
 
 ```text
-src/zxing_dart.{h,cpp}   C ABI shim: zxd_read, zxd_encode_aztec, releases
+src/zxing_dart.{h,cpp}   C ABI shim: read, encode, and release calls
 src/dart_alloc.h         Dart-VM-symmetric allocator (from flutter_zxing, MIT)
 native_test/             ABI-only C++ conformance tests (no zxing headers)
 tool/fetch_zxing.sh      pinned fetch (commit hash verified post-checkout)

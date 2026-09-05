@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runtime-test the exact committed Windows x64 DLL under Wine in a clean pinned
 # Linux/amd64 container. The test executable links through an import library
-# generated from our canonical six-symbol .def file.
+# generated from our canonical seven-symbol .def file.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"

@@ -121,6 +121,35 @@ void testRoundTrip(const std::string& payload, int32_t errorCorrectionPercent)
     zxd_matrix_release(&matrix); // double-release must be safe
 }
 
+void testDataMatrixRoundTrip()
+{
+    const std::string payload = "tnx2:data-matrix";
+    zxd_matrix matrix;
+    CHECK(zxd_encode(
+              reinterpret_cast<const uint8_t*>(payload.data()),
+              static_cast<uint32_t>(payload.size()), ZXD_FORMAT_DATA_MATRIX, -1,
+              &matrix) == ZXD_OK);
+    CHECK(matrix.width > 0 && matrix.width == matrix.height && matrix.bits != nullptr);
+
+    const Raster raster = rasterize(matrix, /*scale=*/6, /*margin=*/24, /*rowPad=*/7);
+    zxd_read_result result;
+    const int32_t status = zxd_read(
+        raster.pixels.data(), static_cast<uint32_t>(raster.pixels.size()),
+        raster.width, raster.height, raster.stride, ZXD_PIXEL_LUM8,
+        ZXD_FORMAT_DATA_MATRIX, /*try_harder=*/1, &result);
+    CHECK(status == ZXD_OK);
+    if (status == ZXD_OK) {
+        CHECK(result.text != nullptr && payload == result.text);
+        CHECK(result.bytes_len == payload.size());
+        CHECK(result.bytes != nullptr &&
+              std::memcmp(result.bytes, payload.data(), payload.size()) == 0);
+        CHECK(result.format == ZXD_FORMAT_DATA_MATRIX);
+    }
+    zxd_read_result_release(&result);
+    zxd_matrix_release(&matrix);
+    std::printf("  data matrix: square symbol round-trip through generic encoder\n");
+}
+
 void testNotFound()
 {
     // Deterministic xorshift noise; astronomically unlikely to decode.
@@ -207,6 +236,12 @@ void testHostileArgs()
     CHECK(zxd_encode_aztec(ok, 7, 100, &m) == ZXD_INVALID_ARGUMENT); // ECC out of range
     CHECK(zxd_encode_aztec(nullptr, 7, -1, &m) == ZXD_INVALID_ARGUMENT);
     CHECK(zxd_encode_aztec(ok, 0, -1, &m) == ZXD_INVALID_ARGUMENT);
+    CHECK(zxd_encode(ok, 7, ZXD_FORMAT_DATA_MATRIX, 0, &m) ==
+          ZXD_INVALID_ARGUMENT); // Data Matrix has no percentage ECC option.
+    CHECK(zxd_encode(ok, 7, ZXD_FORMAT_QR_CODE, -1, &m) ==
+          ZXD_INVALID_ARGUMENT); // QR writing is not part of ABI 3.
+    CHECK(zxd_encode(ok, 7, ZXD_FORMAT_AZTEC | ZXD_FORMAT_DATA_MATRIX, -1, &m) ==
+          ZXD_INVALID_ARGUMENT); // Exactly one writable format is required.
 }
 
 uint32_t fuzzNext(uint32_t& state)
@@ -287,6 +322,7 @@ int main()
         /*errorCorrectionPercent=*/-1);
     // Highest ECC, short payload.
     testRoundTrip("tnx2:short", /*errorCorrectionPercent=*/50);
+    testDataMatrixRoundTrip();
 
     testNotFound();
     testStableFormatTranslation();

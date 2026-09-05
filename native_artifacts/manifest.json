@@ -15,65 +15,65 @@
   "web": {
     "loader": {
       "path": "lib/web/zxing_dart_loader.mjs",
-      "sha256": "0b6dbcabe39a0ec7812a093b357ffe61b9cf291d55d4d5fd0d75816a28c9f151"
+      "sha256": "9e9b38f9badd64682b6e72dd37666aa42d0a96d0ccbe448848516c325b9b8386"
     },
     "worker": {
       "path": "lib/web/zxing_dart_worker.mjs",
-      "sha256": "a3f5b81927a5af065c439d01bd7953e00ce3ef544a7dd5476f4d44f5e9569318"
+      "sha256": "0f7bc65f4b4db9a3290e1b5c3935805644eb642251ea109ac374469d5ccf69f4"
     },
     "module": {
       "path": "lib/web/zxing_dart_module.mjs",
-      "sha256": "b72177213f7c496a8933ce3f51ec18b586e30376fd186a67d75486dd8f170898"
+      "sha256": "029e37a507a94a1f236b6f56585b5e1b47b474e68fdabf52db8f7d61bfbfd046"
     },
     "wasm": {
       "path": "lib/web/zxing_dart_module.wasm",
-      "sha256": "ff2de858491cd0fb718253927ba74bb0346d1dc72ec88ba3b9522f41e26df3fe"
+      "sha256": "ea57c8ed956231687e3ea6f489156d106905c4caf7af0d3d5ddd10b4055b087f"
     }
   },
   "artifacts": {
     "macos-arm64": {
       "path": "macos-arm64/libzxing_dart.dylib",
-      "sha256": "2ddf922675a7b4b59df37c0357c6f9a03cd3c6d77e66c80dec01153d2ab53083"
+      "sha256": "d224315a2a18e3efd5cc9bbbed493920eefec1617e345192cd514c34dbcc5401"
     },
     "macos-x64": {
       "path": "macos-x64/libzxing_dart.dylib",
-      "sha256": "c2f461c663eab7d2c8bb5964f32da2becafe520062ff1c630abe909cdd418717"
+      "sha256": "3de9191b8189aeaffb10b5eacb64c33922a4adffd51841e0364f2c0a2bca3e73"
     },
     "ios-arm64-iphoneos": {
       "path": "ios-arm64-iphoneos/libzxing_dart.dylib",
-      "sha256": "8452cb1df0f70567eaa73dac9500a9e14adc81adebeb9fe06d6aaf22a44616c1"
+      "sha256": "d6e7d83c8fd39572f7e0a3c0855c7011786704cbad793c9dfb40e6d2b1016fb1"
     },
     "ios-arm64-iphonesimulator": {
       "path": "ios-arm64-iphonesimulator/libzxing_dart.dylib",
-      "sha256": "3884400b8acd3aa4514363f1ad11989ea2b6bd22c1fb9fda2db6e683d35e7325"
+      "sha256": "2e3ca2707570171a825ff491e27d3d3412ce61f6d85c0e0122f387eeee8df0a5"
     },
     "ios-x64-iphonesimulator": {
       "path": "ios-x64-iphonesimulator/libzxing_dart.dylib",
-      "sha256": "fbbbde46665a1dd6eae285683286c406a4646242d2b40c75add909ec16e02942"
+      "sha256": "c149a340e244f036c7e94cb821b05aff5ea4987adc504250bbf761db8144b995"
     },
     "android-arm": {
       "path": "android-arm/libzxing_dart.so",
-      "sha256": "218f6e1e8b2436b26b737f95d51ecb648c7dca13b2ff9f2646812f2f8b439daa"
+      "sha256": "04d8d7f59aed92130ecfc857a91edce0bf74e0b78276d6beb0842edec1f51834"
     },
     "android-arm64": {
       "path": "android-arm64/libzxing_dart.so",
-      "sha256": "94027f6a3757daabe2ea3f6e7c73909382e8ac8c7465faf452eac6af990db9fd"
+      "sha256": "ab907b91ab54b083ff621fe71d83814b2670de83bdfe04381c778e88dfe6dc4d"
     },
     "android-x64": {
       "path": "android-x64/libzxing_dart.so",
-      "sha256": "c8ee68f38df80d4bb386b48dcfe00d070b56fe3cf729ed41052961a6b0eb39aa"
+      "sha256": "edf85c091d65ccf5db51efd0e2c4cf55e44396d7b746271e22e3e7a13e3e15b3"
     },
     "linux-arm64": {
       "path": "linux-arm64/libzxing_dart.so",
-      "sha256": "9ba19fa0cfaf7913de18daa19c671596015788c4940c573384c457e99bf9c1c1"
+      "sha256": "666193bb87ffa396de8ea503728d7b1b44a264f0ee62cc012d8f82671da46886"
     },
     "linux-x64": {
       "path": "linux-x64/libzxing_dart.so",
-      "sha256": "74ff39cc088e99e0c8bef0518e11bdd4b62c1fd2a591bafcc7eb4fd7c3018f84"
+      "sha256": "01f7be2623fdd4cbd8d7122ef375787687d2abd740484d53302daa987471f30b"
     },
     "windows-x64": {
       "path": "windows-x64/zxing_dart.dll",
-      "sha256": "e234d2452e6726ca13f31d93f594b32b3ef083b86bdb7a7dcb3bc65ce4156394"
+      "sha256": "0a3fb20b396af9f7bf58aafed04db760e88c4f63fd967bd33a6f6400d91f3988"
     }
   }
 }

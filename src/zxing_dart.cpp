@@ -41,7 +41,8 @@ uint32_t bytesPerPixel(ZXing::ImageFormat format) noexcept
 
 // Package-owned flags are intentionally smaller than and independent from
 // zxing-cpp's ISO symbology/variant IDs.
-constexpr uint32_t kKnownFormatMask = ZXD_FORMAT_AZTEC | ZXD_FORMAT_QR_CODE;
+constexpr uint32_t kKnownFormatMask =
+    ZXD_FORMAT_AZTEC | ZXD_FORMAT_QR_CODE | ZXD_FORMAT_DATA_MATRIX;
 
 ZXing::BarcodeFormats toZxingFormats(uint32_t mask)
 {
@@ -54,6 +55,7 @@ ZXing::BarcodeFormats toZxingFormats(uint32_t mask)
 
     add(ZXD_FORMAT_AZTEC, {F::Aztec});
     add(ZXD_FORMAT_QR_CODE, {F::QRCodeModel1, F::QRCodeModel2});
+    add(ZXD_FORMAT_DATA_MATRIX, {F::DataMatrix});
     return ZXing::BarcodeFormats(std::move(formats));
 }
 
@@ -67,6 +69,7 @@ int32_t fromZxingFormat(ZXing::BarcodeFormat format) noexcept
     case F::QRCode:
     case F::QRCodeModel1:
     case F::QRCodeModel2: return ZXD_FORMAT_QR_CODE;
+    case F::DataMatrix: return ZXD_FORMAT_DATA_MATRIX;
     default: return ZXD_FORMAT_ANY;
     }
 }
@@ -82,7 +85,7 @@ int32_t zxd_abi_version(void) noexcept
 
 const char* zxd_build_info(void) noexcept
 {
-    return "zxing_dart ABI 2; zxing-cpp " ZXING_VERSION_STR "; zint 2.16.0";
+    return "zxing_dart ABI 3; zxing-cpp " ZXING_VERSION_STR "; zint 2.16.0";
 }
 
 int32_t zxd_read(
@@ -198,9 +201,10 @@ void zxd_read_result_release(zxd_read_result* result) noexcept
     std::memset(result, 0, sizeof(*result));
 }
 
-int32_t zxd_encode_aztec(
+static int32_t encode_impl(
     const uint8_t* payload,
     uint32_t payload_length,
+    ZXing::BarcodeFormat zxingFormat,
     int32_t error_correction_percent,
     zxd_matrix* out) noexcept
 {
@@ -225,12 +229,18 @@ int32_t zxd_encode_aztec(
     try {
         const std::string contents(reinterpret_cast<const char*>(payload), payload_length);
         std::string creatorOptions;
+        if (zxingFormat == ZXing::BarcodeFormat::DataMatrix) {
+            // Square symbols only. zint would otherwise pick rectangular DMRE
+            // sizes for some payload lengths, which breaks the aspect-ratio
+            // assumptions of every rendering consumer of zxd_matrix.
+            creatorOptions = "forceSquare=true";
+        }
         if (error_correction_percent >= 0) {
             creatorOptions =
                 "ecLevel=" + std::to_string(error_correction_percent) + "%";
         }
         auto barcode = ZXing::CreateBarcodeFromText(
-            contents, ZXing::CreatorOptions(ZXing::BarcodeFormat::Aztec, creatorOptions));
+            contents, ZXing::CreatorOptions(zxingFormat, creatorOptions));
         if (!barcode.isValid()) {
             return ZXD_ENCODE_ERROR;
         }
@@ -262,6 +272,47 @@ int32_t zxd_encode_aztec(
     } catch (...) {
         zxd_matrix_release(out);
         return ZXD_ENCODE_ERROR;
+    }
+}
+
+int32_t zxd_encode_aztec(
+    const uint8_t* payload,
+    uint32_t payload_length,
+    int32_t error_correction_percent,
+    zxd_matrix* out) noexcept
+{
+    return encode_impl(
+        payload, payload_length, ZXing::BarcodeFormat::Aztec, error_correction_percent, out);
+}
+
+int32_t zxd_encode(
+    const uint8_t* payload,
+    uint32_t payload_length,
+    uint32_t format,
+    int32_t error_correction_percent,
+    zxd_matrix* out) noexcept
+{
+    switch (format) {
+    case ZXD_FORMAT_AZTEC:
+        return encode_impl(
+            payload, payload_length, ZXing::BarcodeFormat::Aztec, error_correction_percent, out);
+    case ZXD_FORMAT_DATA_MATRIX:
+        // DataMatrix Reed-Solomon capacity is fixed by symbol size; a caller
+        // passing a percentage is asking for something zint would ignore.
+        if (error_correction_percent != -1) {
+            if (out != nullptr) {
+                std::memset(out, 0, sizeof(*out));
+            }
+            return ZXD_INVALID_ARGUMENT;
+        }
+        return encode_impl(
+            payload, payload_length, ZXing::BarcodeFormat::DataMatrix, -1, out);
+    default:
+        // Exactly one known writable format bit; QR is decode-only for now.
+        if (out != nullptr) {
+            std::memset(out, 0, sizeof(*out));
+        }
+        return ZXD_INVALID_ARGUMENT;
     }
 }
 

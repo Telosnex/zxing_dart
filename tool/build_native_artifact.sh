@@ -232,6 +232,7 @@ expected_exports="$build_dir/expected_exports.txt"
 cat > "$expected_exports" <<'EOF'
 zxd_abi_version
 zxd_build_info
+zxd_encode
 zxd_encode_aztec
 zxd_matrix_release
 zxd_read
@@ -330,11 +331,11 @@ elif [[ "$os" == windows ]]; then
 fi
 
 if ! diff -u "$expected_exports" "$build_dir/actual_exports.txt"; then
-  echo 'Artifact export surface does not match the six-call shim ABI.' >&2
+  echo 'Artifact export surface does not match the seven-call shim ABI.' >&2
   exit 1
 fi
 
-strings "$artifact" | grep 'zxing_dart ABI 2; zxing-cpp 3.1.1; zint 2.16.0' >/dev/null || {
+strings "$artifact" | grep 'zxing_dart ABI 3; zxing-cpp 3.1.1; zint 2.16.0' >/dev/null || {
   echo 'Artifact build-info string is missing or unexpected.' >&2
   exit 1
 }

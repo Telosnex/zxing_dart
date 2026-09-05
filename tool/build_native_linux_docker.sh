@@ -29,7 +29,7 @@ docker run --rm --platform "$platform" \
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
     apt-get install -y --no-install-recommends \
-      ca-certificates cmake git make python3 binutils
+      cmake make python3 binutils
     g++ -dumpfullversion | grep "^12\."
     ZXD_BUILD_JOBS='"${ZXD_BUILD_JOBS:-4}"' tool/build_native_artifact.sh '"$target"'
   '

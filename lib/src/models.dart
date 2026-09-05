@@ -20,6 +20,7 @@ final class ZxingCapabilities {
     required this.buildInfo,
     required this.canReadBarcodes,
     required this.canEncodeAztec,
+    required this.canEncodeDataMatrix,
   });
 
   final ZxingRuntime runtime;
@@ -27,12 +28,13 @@ final class ZxingCapabilities {
   final String buildInfo;
   final bool canReadBarcodes;
   final bool canEncodeAztec;
+  final bool canEncodeDataMatrix;
 
   @override
   String toString() =>
       'ZxingCapabilities(runtime: $runtime, abiVersion: $abiVersion, '
       'canReadBarcodes: $canReadBarcodes, canEncodeAztec: $canEncodeAztec, '
-      'buildInfo: $buildInfo)';
+      'canEncodeDataMatrix: $canEncodeDataMatrix, buildInfo: $buildInfo)';
 }
 
 /// Pixel layout accepted by [ZxingDart.readBarcode].
@@ -54,7 +56,8 @@ enum BarcodePixelFormat {
 /// Barcode symbologies currently exposed by the stable Dart API.
 enum BarcodeFormat {
   aztec(1),
-  qrCode(1 << 1);
+  qrCode(1 << 1),
+  dataMatrix(1 << 2);
 
   const BarcodeFormat(this.nativeValue);
 

@@ -34,6 +34,7 @@ Future<ZxingBackend> loadBackend() async {
       buildInfo: buildInfoPointer.cast<Utf8>().toDartString(),
       canReadBarcodes: true,
       canEncodeAztec: true,
+      canEncodeDataMatrix: true,
     ),
   );
 }
@@ -70,7 +71,22 @@ final class _NativeBackend implements ZxingBackend {
     Uint8List asciiPayload, {
     required int errorCorrectionPercent,
   }) => Isolate.run(
-    () => _encodeOnHelperIsolate(asciiPayload, errorCorrectionPercent),
+    () => _encodeOnHelperIsolate(
+      asciiPayload,
+      formatBit: 1, // ZXD_FORMAT_AZTEC
+      errorCorrectionPercent: errorCorrectionPercent,
+      operation: 'encode Aztec',
+    ),
+  );
+
+  @override
+  Future<BarcodeMatrix> encodeDataMatrix(Uint8List asciiPayload) => Isolate.run(
+    () => _encodeOnHelperIsolate(
+      asciiPayload,
+      formatBit: 1 << 2, // ZXD_FORMAT_DATA_MATRIX
+      errorCorrectionPercent: -1,
+      operation: 'encode DataMatrix',
+    ),
   );
 }
 
@@ -134,20 +150,23 @@ BarcodeResult? _readOnHelperIsolate(
 }
 
 BarcodeMatrix _encodeOnHelperIsolate(
-  Uint8List asciiPayload,
-  int errorCorrectionPercent,
-) {
+  Uint8List asciiPayload, {
+  required int formatBit,
+  required int errorCorrectionPercent,
+  required String operation,
+}) {
   final input = malloc<Uint8>(asciiPayload.length);
   final output = calloc<native.zxd_matrix>();
   try {
     input.asTypedList(asciiPayload.length).setAll(0, asciiPayload);
-    final status = native.zxd_encode_aztec(
+    final status = native.zxd_encode(
       input,
       asciiPayload.length,
+      formatBit,
       errorCorrectionPercent,
       output,
     );
-    _throwForStatus(status, operation: 'encode Aztec');
+    _throwForStatus(status, operation: operation);
 
     final matrix = output.ref;
     if (matrix.width == 0 || matrix.height == 0 || matrix.bits.address == 0) {

@@ -8,7 +8,7 @@ import '../web_config.dart';
 import 'backend.dart';
 
 /// Must match ZXD_ABI_VERSION and zxing_dart_loader.mjs.
-const _abiVersion = 2;
+const _abiVersion = 3;
 
 const _flutterAssetWorkerUrl =
     'assets/packages/zxing_dart/web/zxing_dart_worker.mjs';
@@ -38,7 +38,8 @@ Future<ZxingBackend> loadBackend() async {
     final expected = capabilities.first;
     for (final actual in capabilities) {
       if (actual.abiVersion != expected.abiVersion ||
-          actual.buildInfo != expected.buildInfo) {
+          actual.buildInfo != expected.buildInfo ||
+          actual.canEncodeDataMatrix != expected.canEncodeDataMatrix) {
         throw StateError('zxing_dart Workers returned different capabilities');
       }
     }
@@ -108,6 +109,10 @@ final class _WebPoolBackend implements ZxingBackend {
       errorCorrectionPercent: errorCorrectionPercent,
     ),
   );
+
+  @override
+  Future<BarcodeMatrix> encodeDataMatrix(Uint8List asciiPayload) =>
+      _enqueue((worker) => worker.encodeDataMatrix(asciiPayload));
 
   Future<T> _enqueue<T>(
     Future<T> Function(_WebWorkerBackend worker) operation,
@@ -253,6 +258,7 @@ final class _WebWorkerBackend implements ZxingBackend {
         buildInfo: result.buildInfo,
         canReadBarcodes: true,
         canEncodeAztec: true,
+        canEncodeDataMatrix: result.canEncodeDataMatrix,
       );
     } on _WorkerFailure catch (failure) {
       throw failure.error;
@@ -328,6 +334,26 @@ final class _WebWorkerBackend implements ZxingBackend {
           operation: 'encodeAztec',
           payload: buffer,
           errorCorrectionPercent: errorCorrectionPercent,
+        ),
+        transfer: buffer,
+      ),
+    );
+    return BarcodeMatrix(
+      width: result.width,
+      height: result.height,
+      bits: result.bits.toDart,
+    );
+  }
+
+  @override
+  Future<BarcodeMatrix> encodeDataMatrix(Uint8List asciiPayload) async {
+    final buffer = _transferableBuffer(asciiPayload);
+    final result = _MatrixResult.wrap(
+      await _request(
+        (id) => _WorkerRequest(
+          id: id,
+          operation: 'encodeDataMatrix',
+          payload: buffer,
         ),
         transfer: buffer,
       ),
@@ -496,6 +522,7 @@ extension type _WorkerError._(JSObject _) implements JSObject {
 extension type _CapabilitiesResult.wrap(JSObject _) implements JSObject {
   external int get abiVersion;
   external String get buildInfo;
+  external bool get canEncodeDataMatrix;
 }
 
 extension type _ReadResult.wrap(JSObject _) implements JSObject {

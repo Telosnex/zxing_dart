@@ -57,7 +57,7 @@ dart run tool/verify_artifacts.dart        # all committed native + web hashes
 
 Every native build starts from a clean target directory, checks the exact
 source commit, validates architecture/platform/minimum OS, ensures no unbundled
-ZXing/libc++ dependency, verifies the complete six-symbol export surface, and
+ZXing/libc++ dependency, verifies the complete seven-symbol export surface, and
 checks the embedded ABI/build-info string. macOS builds additionally execute
 the ABI-only encode/decode smoke test, including x64 under Rosetta on arm64.
 

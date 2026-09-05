@@ -49,7 +49,7 @@ em++ "$root/src/zxing_dart.cpp" "$zxing_lib" \
   -sENVIRONMENT=web,worker,node \
   -sALLOW_MEMORY_GROWTH=1 \
   -sFILESYSTEM=0 \
-  -sEXPORTED_FUNCTIONS='["_malloc","_free","_zxd_abi_version","_zxd_build_info","_zxd_read","_zxd_read_result_release","_zxd_encode_aztec","_zxd_matrix_release"]' \
+  -sEXPORTED_FUNCTIONS='["_malloc","_free","_zxd_abi_version","_zxd_build_info","_zxd_read","_zxd_read_result_release","_zxd_encode_aztec","_zxd_encode","_zxd_matrix_release"]' \
   -sEXPORTED_RUNTIME_METHODS='["UTF8ToString","HEAPU8"]' \
   -o "$root/lib/web/zxing_dart_module.mjs"
 

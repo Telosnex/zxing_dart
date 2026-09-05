@@ -27,7 +27,7 @@ extern "C" {
 #define ZXD_EXPORT __attribute__((visibility("default")))
 #endif
 
-#define ZXD_ABI_VERSION 2
+#define ZXD_ABI_VERSION 3
 
 // ---------------------------------------------------------------------------
 // Status codes (returned as int32_t).
@@ -52,6 +52,7 @@ extern "C" {
 #define ZXD_FORMAT_ANY 0 // mask 0 == let zxing-cpp try all formats
 #define ZXD_FORMAT_AZTEC (1 << 0)
 #define ZXD_FORMAT_QR_CODE (1 << 1)
+#define ZXD_FORMAT_DATA_MATRIX (1 << 2)
 
 // ---------------------------------------------------------------------------
 // zxd_read: decode one barcode from a pixel buffer.
@@ -136,6 +137,28 @@ typedef struct zxd_matrix {
 ZXD_EXPORT int32_t zxd_encode_aztec(
     const uint8_t* payload,
     uint32_t payload_length,
+    int32_t error_correction_percent,
+    zxd_matrix* out) ZXD_NOEXCEPT;
+
+// Encodes `payload` as a symbol of the single format named by `format`
+// (one ZXD_FORMAT_* bit; masks with multiple bits are rejected).
+//
+// Added in ABI 3.
+//
+//   format       ZXD_FORMAT_AZTEC or ZXD_FORMAT_DATA_MATRIX. QR is decode-only
+//                for now: no consumer needs QR writing, and an untested writer
+//                path is a liability, not a feature.
+//   error_correction_percent  Aztec: 0..99 or -1 (see zxd_encode_aztec).
+//                DataMatrix: must be -1. Its Reed-Solomon budget is fixed by
+//                symbol size; accepting a percentage here would silently lie.
+//                DataMatrix output is always square (zint forceSquare):
+//                rectangular DMRE sizes would break renderer aspect-ratio
+//                assumptions for some payload lengths.
+//   Other parameters and ownership are identical to zxd_encode_aztec.
+ZXD_EXPORT int32_t zxd_encode(
+    const uint8_t* payload,
+    uint32_t payload_length,
+    uint32_t format,
     int32_t error_correction_percent,
     zxd_matrix* out) ZXD_NOEXCEPT;
 

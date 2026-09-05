@@ -5,6 +5,7 @@ ZXING_DART_1 {
     zxd_read;
     zxd_read_result_release;
     zxd_encode_aztec;
+    zxd_encode;
     zxd_matrix_release;
   local:
     *;

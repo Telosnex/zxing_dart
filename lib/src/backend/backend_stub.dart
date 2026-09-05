@@ -17,6 +17,7 @@ final class _UnsupportedBackend implements ZxingBackend {
     buildInfo: 'No zxing_dart backend for this platform',
     canReadBarcodes: false,
     canEncodeAztec: false,
+    canEncodeDataMatrix: false,
   );
 
   @override
@@ -35,4 +36,8 @@ final class _UnsupportedBackend implements ZxingBackend {
     Uint8List asciiPayload, {
     required int errorCorrectionPercent,
   }) => throw const ZxingException(4, 'Unsupported platform');
+
+  @override
+  Future<BarcodeMatrix> encodeDataMatrix(Uint8List asciiPayload) =>
+      throw const ZxingException(4, 'Unsupported platform');
 }

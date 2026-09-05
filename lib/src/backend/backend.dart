@@ -20,4 +20,6 @@ abstract interface class ZxingBackend {
     Uint8List asciiPayload, {
     required int errorCorrectionPercent,
   });
+
+  Future<BarcodeMatrix> encodeDataMatrix(Uint8List asciiPayload);
 }
