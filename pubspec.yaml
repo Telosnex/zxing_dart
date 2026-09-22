@@ -26,7 +26,11 @@ dev_dependencies:
 # consumers serve lib/web/ themselves and configure ZxingDartWeb.workerUri.
 flutter:
   assets:
-    - packages/zxing_dart/web/zxing_dart_worker.mjs
-    - packages/zxing_dart/web/zxing_dart_loader.mjs
-    - packages/zxing_dart/web/zxing_dart_module.mjs
-    - packages/zxing_dart/web/zxing_dart_module.wasm
+    - path: packages/zxing_dart/web/zxing_dart_worker.mjs
+      platforms: [web]
+    - path: packages/zxing_dart/web/zxing_dart_loader.mjs
+      platforms: [web]
+    - path: packages/zxing_dart/web/zxing_dart_module.mjs
+      platforms: [web]
+    - path: packages/zxing_dart/web/zxing_dart_module.wasm
+      platforms: [web]
