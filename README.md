@@ -69,7 +69,7 @@ Pin bumps are reviewed changes accompanied by a full conformance run.
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
-tool/build_all_native.sh # all eleven native production tuples
+tool/build_all_native.sh # all twelve native production tuples
 tool/build_web.sh     # pinned Emscripten ES module + Wasm
 dart test             # verifies code-asset hash, ABI, Dart/FFI/isolate path
 tool/test_all.sh      # VM + Chrome dart2js + Chrome dart2wasm + Safari
@@ -128,10 +128,10 @@ committed package assets with hashes in `native_artifacts/manifest.json`.
    artifacts, VM/Chrome dart2js/Chrome dart2wasm/Safari parity suite, Worker
    initialization/error/replacement tests
 4. ✅ Complete native matrix: Android armv7/arm64/x64, iOS arm64 device +
-   arm64/x64 simulator, macOS arm64/x64, Linux arm64/x64, Windows x64;
+   arm64/x64 simulator, macOS arm64/x64, Linux arm64/x64, Windows arm64/x64;
    restricted export surfaces, static C++ runtimes where appropriate, 16KB
    Android pages, verified hashes, and runtime ABI tests on every OS family
-   (Windows under Wine).
+   (Windows x64 under Wine; Windows arm64 on a Windows arm64 host).
 5. ✅ Package-owned conformance v1: 40 deterministic camera recipes covering
    rotation/perspective/distance/blur/motion/glare/moiré/exposure/noise/stride
    and compound scenes; 70 tasks per backend across production, independent

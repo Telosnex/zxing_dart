@@ -13,16 +13,20 @@ CocoaPods, Gradle native dependencies, a system installation, or a CDN.
 - Apple: Xcode 26 / Apple clang 17; macOS 12, iOS 13
 - Android: NDK `28.2.13676358`, API 24, static libc++, 16KB page alignment
 - Linux: pinned GCC 12.3-on-bullseye, glibc 2.31, static libstdc++/libgcc
-- Windows: pinned Debian bookworm-slim, MinGW-w64 GCC 12 POSIX x64,
+- Windows x64: pinned Debian bookworm-slim, MinGW-w64 GCC 12 POSIX x64,
   static runtimes
+- Windows arm64: the same pinned Debian bookworm-slim index, SHA-256-pinned
+  llvm-mingw `20260922` UCRT; static libc++, libunwind, and compiler-rt
 - Web: Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)
 
 Artifacts expose only the six `zxd_*` C ABI symbols. Upstream C++ symbols are
 hidden by an exported-symbol list (Apple), ELF version script (Android/Linux),
 or module definition file (Windows).
 Licenses and notices are under `licenses/`, including zint's backend BSD terms,
-LLVM/libc++ for Android, GCC 12's GPLv3 text and Runtime Library Exception, and
-MinGW notices for statically linked Linux/Windows runtime components.
+LLVM/libc++ for Android and Windows arm64, GCC 12's GPLv3 text and Runtime
+Library Exception, and MinGW notices for statically linked Linux/Windows runtime components.
+Windows arm64 imports only system DLLs: KERNEL32, ole32, and the Universal C
+Runtime API sets present on Windows 10 and later.
 
 ## Complete intentional matrix
 
@@ -38,6 +42,7 @@ MinGW notices for statically linked Linux/Windows runtime components.
 | Android x64 | API 24 | `c8ee68f38df80d4bb386b48dcfe00d070b56fe3cf729ed41052961a6b0eb39aa` |
 | Linux arm64 | glibc 2.31 baseline | `9ba19fa0cfaf7913de18daa19c671596015788c4940c573384c457e99bf9c1c1` |
 | Linux x64 | glibc 2.31 baseline | `74ff39cc088e99e0c8bef0518e11bdd4b62c1fd2a591bafcc7eb4fd7c3018f84` |
+| Windows arm64 | Windows 10 UCRT | `213903c0201c3851ab395a704d8ab366fe7a063855c12e5c674db8301c42be8f` |
 | Windows x64 | MinGW/Win32 | `e234d2452e6726ca13f31d93f594b32b3ef083b86bdb7a7dcb3bc65ce4156394` |
 | Browser Wasm | module Worker + Wasm | `ff2de858491cd0fb718253927ba74bb0346d1dc72ec88ba3b9522f41e26df3fe` |
 
@@ -50,7 +55,7 @@ selecting an unpinned or system library.
 
 ```bash
 tool/build_native_artifact.sh macos-arm64  # one tuple
-tool/build_all_native.sh                   # all eleven native tuples
+tool/build_all_native.sh                   # all twelve native tuples
 tool/build_web.sh                          # deterministic web artifacts
 dart run tool/verify_artifacts.dart        # all committed native + web hashes
 ```
@@ -73,6 +78,11 @@ tool/test_linux_dart_docker.sh linux-x64
 tool/test_windows_wine_docker.sh
 tool/test_windows_dart_wine_docker.sh # x64 Linux CI host
 ```
+
+Windows arm64 has no Wine path. Verify it on a Windows arm64 host: build
+`native_test/smoke_test.cpp` with the same llvm-mingw release against an import
+library generated from `src/exports_windows.def`, run it beside the committed
+DLL, then run `dart test` with a `windows_arm64` Dart SDK.
 
 The first compiles a simulator executable, boots an available simulator, and
 executes the complete encode/decode ABI suite. The second uses a connected

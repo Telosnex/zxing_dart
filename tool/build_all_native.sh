@@ -23,7 +23,9 @@ for target in linux-arm64 linux-x64; do
   ./tool/build_native_linux_docker.sh "$target"
 done
 
-echo '=== windows-x64 ==='
-./tool/build_native_windows_docker.sh windows-x64
+for target in windows-arm64 windows-x64; do
+  echo "=== $target ==="
+  ./tool/build_native_windows_docker.sh "$target"
+done
 
 dart run tool/verify_artifacts.dart

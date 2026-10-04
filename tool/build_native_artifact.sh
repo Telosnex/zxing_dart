@@ -19,7 +19,7 @@ Targets:
   ios-x64-iphonesimulator
   android-arm              android-arm64              android-x64
   linux-arm64              linux-x64
-  windows-x64
+  windows-arm64            windows-x64
 
 Apple targets require Xcode. Android targets require ANDROID_NDK_HOME or a
 standard Android SDK installation. Linux/Windows targets use Linux compilers
@@ -29,7 +29,7 @@ EOF
 }
 
 case "$target" in
-  macos-arm64|macos-x64|ios-arm64-iphoneos|ios-arm64-iphonesimulator|ios-x64-iphonesimulator|android-arm|android-arm64|android-x64|linux-arm64|linux-x64|windows-x64) ;;
+  macos-arm64|macos-x64|ios-arm64-iphoneos|ios-arm64-iphonesimulator|ios-x64-iphonesimulator|android-arm|android-arm64|android-x64|linux-arm64|linux-x64|windows-arm64|windows-x64) ;;
   *) usage ;;
 esac
 
@@ -49,6 +49,7 @@ artifact_arch=
 output_name=
 verification_nm=
 verification_readelf=
+verification_readobj=
 strip_tool=
 run_smoke=false
 
@@ -193,6 +194,29 @@ case "$target" in
     )
     output_name=zxing_dart.dll
     ;;
+  windows-arm64)
+    os=windows
+    [[ "$(uname -s)" == Linux ]] || {
+      echo 'Windows artifacts must be cross-built on Linux; use build_native_windows_docker.sh.' >&2
+      exit 1
+    }
+    artifact_arch=arm64
+    # GCC has no Windows ARM64 target. The pinned llvm-mingw toolchain targets
+    # UCRT and statically folds libc++, libunwind, and compiler-rt into the DLL.
+    cc="${CC:-aarch64-w64-mingw32-clang}"
+    cxx="${CXX:-aarch64-w64-mingw32-clang++}"
+    strip_tool="${STRIP:-aarch64-w64-mingw32-strip}"
+    verification_readobj="${READOBJ:-llvm-readobj}"
+    cmake_args+=(
+      -DCMAKE_SYSTEM_NAME=Windows
+      -DCMAKE_SYSTEM_PROCESSOR=ARM64
+      -DCMAKE_C_COMPILER="$cc"
+      -DCMAKE_CXX_COMPILER="$cxx"
+      -DCMAKE_RC_COMPILER="${WINDRES:-aarch64-w64-mingw32-windres}"
+      -DCMAKE_SHARED_LINKER_FLAGS=-Wl,--no-insert-timestamp
+    )
+    output_name=zxing_dart.dll
+    ;;
 esac
 
 jobs="${ZXD_BUILD_JOBS:-$(sysctl -n hw.logicalcpu 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
@@ -311,7 +335,20 @@ elif [[ "$os" == android || "$os" == linux ]]; then
   "$verification_nm" -D --defined-only "$artifact" \
     | awk '{print $3}' | sed 's/@@.*//; /^ZXING_DART_1$/d' | sort -u \
     > "$build_dir/actual_exports.txt"
-elif [[ "$os" == windows ]]; then
+elif [[ "$target" == windows-arm64 ]]; then
+  "$verification_readobj" --file-headers "$artifact" \
+    | grep -E 'Machine: IMAGE_FILE_MACHINE_ARM64 ' >/dev/null || {
+      echo 'Unexpected PE machine: expected IMAGE_FILE_MACHINE_ARM64.' >&2; exit 1;
+    }
+  if "$verification_readobj" --coff-imports "$artifact" \
+      | grep -Ei 'Name:.*(ZXing|libc\+\+|libunwind|libstdc\+\+|libgcc_s|winpthread)'; then
+    echo 'Windows artifact has an unbundled C++/ZXing runtime dependency.' >&2
+    exit 1
+  fi
+  "$verification_readobj" --coff-exports "$artifact" \
+    | awk '$1 == "Name:" { print $2 }' | sort -u \
+    > "$build_dir/actual_exports.txt"
+elif [[ "$target" == windows-x64 ]]; then
   machine="$($verification_objdump -f "$artifact" | awk '/architecture:/ {gsub(",", "", $2); print $2}')"
   [[ "$machine" == i386:x86-64 ]] || {
     echo "Unexpected PE machine: $machine" >&2; exit 1;

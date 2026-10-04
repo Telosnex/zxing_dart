@@ -10,6 +10,7 @@
     "android": "Android NDK 28.2.13676358, API 24, libc++ static",
     "linux": "GCC 12.3.0 bullseye 5e1768ff, glibc 2.31, static libstdc++/libgcc",
     "windows": "Debian bookworm-slim abd67ffc, MinGW-w64 GCC 12 POSIX x64, static runtimes",
+    "windows-arm64": "Debian bookworm-slim abd67ffc platform image, llvm-mingw 20260922 UCRT (LLVM/clang), static libc++/libunwind/compiler-rt",
     "web": "Emscripten 5.0.0 a7c5deabd7c88ba1c38ebe988112256775f944c6"
   },
   "web": {
@@ -70,6 +71,10 @@
     "linux-x64": {
       "path": "linux-x64/libzxing_dart.so",
       "sha256": "01f7be2623fdd4cbd8d7122ef375787687d2abd740484d53302daa987471f30b"
+    },
+    "windows-arm64": {
+      "path": "windows-arm64/zxing_dart.dll",
+      "sha256": "213903c0201c3851ab395a704d8ab366fe7a063855c12e5c674db8301c42be8f"
     },
     "windows-x64": {
       "path": "windows-x64/zxing_dart.dll",

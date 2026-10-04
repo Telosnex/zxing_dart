@@ -18,5 +18,7 @@
   Aztec error correction rather than preserving unreleased legacy semantics.
 - Add ABI 3 generic encoding and Data Matrix format support, including square
   symbols on native and Web backends.
+- Add a pinned Windows arm64 artifact cross-built with llvm-mingw UCRT and
+  verified with the native ABI and public Dart suites on Windows arm64.
 - Move native compilation to C++20. Preserve Linux glibc 2.31 using pinned GCC
   12-on-bullseye images; use pinned MinGW GCC 12 for Windows.
