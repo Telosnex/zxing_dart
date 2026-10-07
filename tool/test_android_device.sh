@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Compile and run the ABI-only smoke executable against the exact committed .so
+# Compile and run the ABI-only smoke executable against the exact staged .so
 # on a connected Android device/emulator. If no device is connected and
 # ZXD_ANDROID_AVD is set, this script starts and later stops that AVD.
 set -euo pipefail
@@ -66,7 +66,7 @@ case "$(uname -s)" in
   *) echo 'Android runtime test requires macOS or Linux.' >&2; exit 1 ;;
 esac
 cxx="$ndk/toolchains/llvm/prebuilt/$ndk_host/bin/$compiler"
-artifact="$root/native_artifacts/$target/libzxing_dart.so"
+artifact="$root/build/native_artifacts/$target/libzxing_dart.so"
 [[ -x "$cxx" ]] || { echo "compiler not found: $cxx" >&2; exit 1; }
 [[ -f "$artifact" ]] || {
   echo "Missing $artifact; run tool/build_native_artifact.sh $target" >&2

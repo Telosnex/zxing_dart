@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runtime-test the exact committed Windows x64 DLL under Wine in a clean pinned
+# Runtime-test the exact staged Windows x64 DLL under Wine in a clean pinned
 # Linux/amd64 container. The test executable links through an import library
 # generated from our canonical seven-symbol .def file.
 set -euo pipefail
@@ -25,7 +25,7 @@ docker run --rm --platform linux/amd64 \
       -std=c++17 -O2 -static -static-libgcc -static-libstdc++ \
       -I src native_test/smoke_test.cpp "$build/libzxing_dart.dll.a" \
       -o "$build/zxd_smoke_test.exe"
-    cp native_artifacts/windows-x64/zxing_dart.dll "$build/"
+    cp build/native_artifacts/windows-x64/zxing_dart.dll "$build/"
     cd "$build"
     export WINEDEBUG=-all WINEPREFIX=/tmp/zxing-dart-wine
     /usr/lib/wine/wine64 ./zxd_smoke_test.exe

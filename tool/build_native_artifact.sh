@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Cross-build one production zxing_dart native code asset from the pinned
-# zxing-cpp source. Consumers never run this script: hook/build.dart only
-# verifies and publishes the committed artifact.
+# zxing-cpp source. Used by hook/build.dart for source builds and Actions
+# releases; matching consumers download the release instead.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -24,6 +24,10 @@ Targets:
 Apple targets require Xcode. Android targets require ANDROID_NDK_HOME or a
 standard Android SDK installation. Linux/Windows targets use Linux compilers
 directly or the provided pinned Docker wrappers.
+
+The hook sets ZXD_THIRD_PARTY, ZXD_BUILD_ROOT and ZXD_OUTPUT to paths outside
+package sources. Optional ZXD_MACOS_VERSION, ZXD_IOS_VERSION, ZXD_ANDROID_API
+select minimum OS versions (defaults: 12.0, 13.0, 24).
 EOF
   exit 64
 }
@@ -33,13 +37,21 @@ case "$target" in
   *) usage ;;
 esac
 
-"$root/tool/fetch_zxing.sh"
+# The hook fetches under a shared lock before building targets concurrently.
+if [[ "${ZXD_SKIP_FETCH:-0}" != 1 ]]; then
+  bash "$root/tool/fetch_zxing.sh"
+fi
+third_party="${ZXD_THIRD_PARTY:-$root/third_party}"
+[[ "$(git -C "$third_party/zxing-cpp" rev-parse HEAD)" == 287c85df6f961c8efbfb5ffd736cd9457b8b890e ]]
+[[ "$(git -C "$third_party/zxing-cpp/zint" rev-parse HEAD)" == 55541e139e62b9209b71cd9b0ba9010cec28b1d9 ]]
+macos_version="${ZXD_MACOS_VERSION:-12.0}"
+ios_version="${ZXD_IOS_VERSION:-13.0}"
 command -v cmake >/dev/null || { echo 'cmake is required' >&2; exit 1; }
 
-build_dir="$root/build/native/$target-v$profile_version"
-artifact_dir="$root/native_artifacts/$target"
+build_dir="${ZXD_BUILD_ROOT:-$root/build/native/$target-v$profile_version}"
 cmake_args=(
   -DCMAKE_BUILD_TYPE=Release
+  -DZXD_ZXING_SOURCE="$third_party/zxing-cpp"
   -DZXD_BUILD_TESTS=OFF
   -DZXING_EXAMPLES=OFF
   -DZXING_UNIT_TESTS=OFF
@@ -60,7 +72,7 @@ case "$target" in
     sdk_path="$(xcrun --sdk macosx --show-sdk-path)"
     cmake_args+=(
       -DCMAKE_OSX_ARCHITECTURES="$artifact_arch"
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+      -DCMAKE_OSX_DEPLOYMENT_TARGET="$macos_version"
       -DCMAKE_OSX_SYSROOT="$sdk_path"
       -DZXD_BUILD_TESTS=ON
     )
@@ -76,7 +88,7 @@ case "$target" in
     cmake_args+=(
       -DCMAKE_SYSTEM_NAME=iOS
       -DCMAKE_OSX_ARCHITECTURES="$artifact_arch"
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0
+      -DCMAKE_OSX_DEPLOYMENT_TARGET="$ios_version"
       -DCMAKE_OSX_SYSROOT="$sdk_path"
       -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
     )
@@ -237,8 +249,8 @@ built_artifact="$build_dir/$output_name"
   echo "Expected artifact missing: $built_artifact" >&2
   exit 1
 }
-mkdir -p "$artifact_dir"
-artifact="$artifact_dir/$output_name"
+artifact="${ZXD_OUTPUT:-$root/build/native_artifacts/$target/$output_name}"
+mkdir -p "$(dirname "$artifact")"
 # GNU cp's sparse-file deallocation path can fail with EINVAL when an arm64
 # container writes through Docker Desktop's VirtioFS mount. A byte stream copy
 # is deterministic and works identically on native hosts and cross containers.
@@ -282,19 +294,21 @@ if [[ "$os" == macos || "$os" == ios ]]; then
 
   build_version="$(xcrun vtool -show-build "$artifact")"
   expected_platform=MACOS
-  expected_min=12.0
+  expected_min="$macos_version"
   if [[ "$os" == ios ]]; then
-    expected_min=13.0
+    expected_min="$ios_version"
     [[ "$target" == *-iphoneos ]] && expected_platform=IOS || expected_platform=IOSSIMULATOR
     # arm64 iOS Simulator is only available from iOS 14. The deployment flag
     # is intentionally 13 for source parity, but ld records the first runtime
     # on which that simulator architecture exists.
-    [[ "$target" == ios-arm64-iphonesimulator ]] && expected_min=14.0
+    if [[ "$target" == ios-arm64-iphonesimulator && "${ios_version%%.*}" -lt 14 ]]; then
+      expected_min=14.0
+    fi
   fi
   grep -q "platform $expected_platform" <<<"$build_version" || {
     echo "Missing expected Apple platform $expected_platform" >&2; exit 1;
   }
-  grep -q "minos $expected_min" <<<"$build_version" || {
+  awk -v expected="$expected_min" '$1 == "minos" && $2 == expected {found=1} END {exit !found}' <<<"$build_version" || {
     echo "Missing expected minimum OS $expected_min" >&2; exit 1;
   }
 elif [[ "$os" == android || "$os" == linux ]]; then

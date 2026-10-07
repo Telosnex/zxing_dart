@@ -21,10 +21,12 @@ set(ZXING_USE_BUNDLED_ZINT ON)
 set(ZXING_C_API OFF)
 set(ZXING_EXAMPLES OFF)
 set(ZXING_UNIT_TESTS OFF)
-if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/zxing-cpp/core/CMakeLists.txt)
+set(ZXD_ZXING_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/third_party/zxing-cpp"
+    CACHE PATH "Pinned zxing-cpp source directory")
+if(NOT EXISTS "${ZXD_ZXING_SOURCE}/core/CMakeLists.txt")
   message(FATAL_ERROR "zxing-cpp not found. Run: tool/fetch_zxing.sh")
 endif()
-add_subdirectory(third_party/zxing-cpp/core EXCLUDE_FROM_ALL)
+add_subdirectory("${ZXD_ZXING_SOURCE}/core" third_party/zxing-cpp/core EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
   # tool/build_web.sh performs the final Emscripten ES-module link explicitly.

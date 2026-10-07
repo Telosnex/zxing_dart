@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Compile the ABI-only smoke executable for the host's iOS Simulator
 # architecture, boot an available simulator, and execute against the exact
-# committed dylib. The simulator is shut down only if this script booted it.
+# staged dylib. The simulator is shut down only if this script booted it.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -25,7 +25,7 @@ case "$(uname -m)" in
   *) echo "Unsupported host architecture: $(uname -m)" >&2; exit 1 ;;
 esac
 
-artifact="$root/native_artifacts/$target/libzxing_dart.dylib"
+artifact="$root/build/native_artifacts/$target/libzxing_dart.dylib"
 [[ -f "$artifact" ]] || {
   echo "Missing $artifact; run tool/build_native_artifact.sh $target" >&2
   exit 1

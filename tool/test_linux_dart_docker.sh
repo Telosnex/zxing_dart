@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the public Dart API suite through package:hooks and @Native against the
-# exact committed Linux code asset. This validates more than the C ABI smoke
+# exact released Linux code asset. This validates more than the C ABI smoke
 # test: target-key selection, hash verification, bundling, symbol lookup,
 # helper-isolate ownership, and typed result conversion.
 set -euo pipefail

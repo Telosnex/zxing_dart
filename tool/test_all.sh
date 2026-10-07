@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 
 dart analyze
 dart run tool/verify_artifacts.dart
+dart run native_prebuilt:check
 dart test -r compact
 dart test -p chrome --compiler dart2js -r compact
 # Each dart2wasm browser suite owns both the Dart test Wasm module and one or

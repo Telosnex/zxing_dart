@@ -14,6 +14,10 @@ dependencies:
   crypto: ^3.0.6
   ffi: ^2.1.4
   hooks: ^2.0.2
+  native_prebuilt:
+    git:
+      url: https://github.com/Telosnex/native_prebuilt.git
+      ref: 59c965b2b4e3fee14e3efa316ed7f7dea4cc49dd
 
 dev_dependencies:
   # Independent pure-Dart Aztec encoder oracle for the conformance corpus.

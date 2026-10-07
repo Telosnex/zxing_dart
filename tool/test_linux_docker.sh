@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runtime-test the exact committed Linux artifact in a clean container of the
+# Runtime-test the exact staged Linux artifact in a clean container of the
 # matching architecture. Both image digests are children of the pinned
 # Debian bullseye-slim manifest used by the production build wrappers.
 set -euo pipefail
@@ -30,9 +30,9 @@ docker run --rm --platform "$platform" \
     build="build/${target}-runtime-smoke"
     rm -rf "$build" && mkdir -p "$build"
     g++ -std=c++17 -O2 -I src native_test/smoke_test.cpp \
-      -L "native_artifacts/$target" -lzxing_dart \
+      -L "build/native_artifacts/$target" -lzxing_dart \
       -Wl,-rpath,'"'"'$ORIGIN'"'"' -o "$build/zxd_smoke_test"
-    cp "native_artifacts/$target/libzxing_dart.so" "$build/"
+    cp "build/native_artifacts/$target/libzxing_dart.so" "$build/"
     "$build/zxd_smoke_test"
   '
 echo "PASS: $target runtime-tested in clean $platform container"

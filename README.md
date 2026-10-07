@@ -2,7 +2,7 @@
 
 A pinned [zxing-cpp](https://github.com/zxing-cpp/zxing-cpp) behind a small
 stable C ABI, with one universal Dart entrypoint. Native backends via FFI +
-committed, SHA-256-pinned artifacts; web backend via an Emscripten module and
+GitHub Actions-built, SHA-256-pinned releases; web backend via an Emscripten module and
 worker. Third application of the porting template documented in
 `image_ffmpeg/doc/PORTING_C_LIBRARIES.md` (after fllama and fonnx; this repo
 follows image_ffmpeg, the most refined iteration).
@@ -32,7 +32,7 @@ native_test/             ABI-only C++ conformance tests (no zxing headers)
 tool/fetch_zxing.sh      pinned fetch (commit hash verified post-checkout)
 tool/build_macos.sh      milestone-1 build: macos-arm64 + smoke test
 lib/                     Dart facade (milestone 2)
-native_artifacts/        committed pinned binaries + complete manifest
+native_artifacts/        source-keyed native release manifest + web hashes
 ```
 
 ## ABI rules
@@ -65,14 +65,45 @@ The 2.3.0 → 3.1.1 API/toolchain/size analysis is recorded in
 
 Pin bumps are reviewed changes accompanied by a full conformance run.
 
+## Native builds and releases
+
+Native libraries are built by `.github/workflows/native_release.yml` for all
+12 supported targets, then published as an immutable GitHub release. The build
+hook uses `native_prebuilt` (the same flow as image_ffmpeg, fllama and fonnx):
+matching sources download verified libraries into a shared cache; modified
+native sources build locally. No Docker/compiler installation is needed to
+consume a matching release. Windows source builds currently require a Linux
+host with MinGW/llvm-mingw; Windows consumers normally download the release.
+
+```yaml
+hooks:
+  user_defines:
+    zxing_dart:
+      native_build: auto # default; also download (fail closed) or source
+```
+
+Run the **native release** Actions workflow, or push to `native-release`.
+`native-release-dry` builds and assembles the manifest without publishing.
+Merge the generated `native-manifest/<tag>` branch to adopt a release.
+
+```sh
+dart run native_prebuilt:check --download # source key + every released hash
+dart run native_prebuilt:key --list      # inputs that determine the release
+```
+
+Web workers/modules/Wasm stay committed and declared in `flutter.assets`:
+Flutter stable does not yet support hook-supplied data assets. Native release
+migration does not change their URLs, content, or delivery.
+
 ## Build & test (milestone 1)
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
 tool/build_all_native.sh # all twelve native production tuples
 tool/build_web.sh     # pinned Emscripten ES module + Wasm
-dart test             # verifies code-asset hash, ABI, Dart/FFI/isolate path
+dart test             # release download/cache, ABI, Dart/FFI/isolate path
 tool/test_all.sh      # VM + Chrome dart2js + Chrome dart2wasm + Safari
+dart run tool/prebuilt_artifacts.dart # stage released native files for ABI scripts
 tool/test_ios_simulator.sh
 ZXD_ANDROID_AVD=Medium_Phone_API_36.0 tool/test_android_device.sh
 tool/test_linux_docker.sh linux-arm64

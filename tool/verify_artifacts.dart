@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 
 Future<void> main() async {
-  final root = Directory.current;
+  final root = File.fromUri(Platform.script).parent.parent;
   final manifestFile = File('${root.path}/native_artifacts/manifest.json');
   final manifest = jsonDecode(await manifestFile.readAsString());
   if (manifest is! Map<String, Object?> || manifest['schema'] != 1) {
@@ -20,41 +20,10 @@ Future<void> main() async {
   }
 
   final checks = <({String label, File file, String expected})>[];
-  final native = manifest['artifacts'];
-  if (native is! Map<String, Object?>) {
-    throw const FormatException('Missing native artifacts');
-  }
-  const expectedNativeTargets = {
-    'macos-arm64',
-    'macos-x64',
-    'ios-arm64-iphoneos',
-    'ios-arm64-iphonesimulator',
-    'ios-x64-iphonesimulator',
-    'android-arm',
-    'android-arm64',
-    'android-x64',
-    'linux-arm64',
-    'linux-x64',
-    'windows-arm64',
-    'windows-x64',
-  };
-  if (native.keys.toSet().difference(expectedNativeTargets).isNotEmpty ||
-      expectedNativeTargets.difference(native.keys.toSet()).isNotEmpty) {
-    throw FormatException(
-      'Native artifact matrix mismatch: expected $expectedNativeTargets, '
-      'found ${native.keys.toSet()}',
+  if (manifest.containsKey('artifacts')) {
+    throw const FormatException(
+      'Native libraries belong in native_artifacts/prebuilt.json.',
     );
-  }
-  for (final MapEntry(key: target, value: encoded) in native.entries) {
-    if (encoded case {'path': final String path, 'sha256': final String hash}) {
-      checks.add((
-        label: target,
-        file: File('${root.path}/native_artifacts/$path'),
-        expected: hash,
-      ));
-    } else {
-      throw FormatException('Malformed native artifact: $target');
-    }
   }
 
   final web = manifest['web'];

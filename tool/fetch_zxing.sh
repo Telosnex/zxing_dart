@@ -13,7 +13,7 @@ readonly REPO_URL="https://github.com/zxing-cpp/zxing-cpp.git"
 readonly ZINT_PIN_COMMIT="55541e139e62b9209b71cd9b0ba9010cec28b1d9"
 
 cd "$(dirname "$0")/.."
-readonly DEST="third_party/zxing-cpp"
+readonly DEST="${ZXD_THIRD_PARTY:-$PWD/third_party}/zxing-cpp"
 
 if [[ -d "${DEST}/.git" ]]; then
   current="$(git -C "${DEST}" rev-parse HEAD)"
