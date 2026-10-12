@@ -1,0 +1,5 @@
+# Source-key hashes are byte-exact and must not vary with checkout platform.
+* text=auto eol=lf
+
+# The web module is byte-exact on every checkout host.
+*.wasm -text
