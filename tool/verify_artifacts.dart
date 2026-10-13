@@ -1,7 +1,9 @@
+/// Checks the upstream source pins and the build profile in
+/// native_artifacts/manifest.json.
+library;
+
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:crypto/crypto.dart';
 
 Future<void> main() async {
   final root = File.fromUri(Platform.script).parent.parent;
@@ -19,51 +21,16 @@ Future<void> main() async {
     throw const FormatException('Unexpected production source/build profile');
   }
 
-  final checks = <({String label, File file, String expected})>[];
   if (manifest.containsKey('artifacts')) {
     throw const FormatException(
       'Native libraries belong in native_artifacts/prebuilt.json.',
     );
   }
-
-  final web = manifest['web'];
-  if (web is! Map<String, Object?>) throw const FormatException('Missing web');
-  const expectedWebAssets = {'loader', 'worker', 'module', 'wasm'};
-  if (web.keys.toSet().difference(expectedWebAssets).isNotEmpty ||
-      expectedWebAssets.difference(web.keys.toSet()).isNotEmpty) {
-    throw FormatException(
-      'Web artifact matrix mismatch: expected $expectedWebAssets, '
-      'found ${web.keys.toSet()}',
+  if (manifest.containsKey('web')) {
+    throw const FormatException(
+      'Web files belong in native_artifacts/web.json (native_prebuilt '
+      'ADR 002). native_prebuilt:check verifies them.',
     );
   }
-  for (final MapEntry(key: name, value: encoded) in web.entries) {
-    if (encoded case {'path': final String path, 'sha256': final String hash}) {
-      checks.add((
-        label: 'web/$name',
-        file: File('${root.path}/$path'),
-        expected: hash,
-      ));
-    } else {
-      throw FormatException('Malformed web artifact: $name');
-    }
-  }
-
-  var failed = false;
-  for (final check in checks) {
-    if (!await check.file.exists()) {
-      stderr.writeln('MISSING ${check.label}: ${check.file.path}');
-      failed = true;
-      continue;
-    }
-    final actual = sha256.convert(await check.file.readAsBytes()).toString();
-    if (actual != check.expected) {
-      stderr.writeln(
-        'MISMATCH ${check.label}: expected ${check.expected}, got $actual',
-      );
-      failed = true;
-    } else {
-      stdout.writeln('OK ${check.label} $actual');
-    }
-  }
-  if (failed) exitCode = 1;
+  stdout.writeln('OK sources and profile');
 }

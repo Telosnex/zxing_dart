@@ -32,7 +32,7 @@ native_test/             ABI-only C++ conformance tests (no zxing headers)
 tool/fetch_zxing.sh      pinned fetch (commit hash verified post-checkout)
 tool/build_macos.sh      milestone-1 build: macos-arm64 + smoke test
 lib/                     Dart facade (milestone 2)
-native_artifacts/        source-keyed native release manifest + web hashes
+native_artifacts/        source-keyed native and web release manifests
 ```
 
 ## ABI rules
@@ -91,18 +91,20 @@ dart run native_prebuilt:check --download # source key + every released hash
 dart run native_prebuilt:key --list      # inputs that determine the release
 ```
 
-Web workers/modules/Wasm stay committed and declared in `flutter.assets`:
-Flutter stable does not yet support hook-supplied data assets. Native release
-migration does not change their URLs, content, or delivery.
+The same release holds the web runtime (native_prebuilt ADR 002). In a
+Flutter web build, the package hook installs the worker, loader, module and
+Wasm binary in `web/native_prebuilt/zxing_dart/` of the app; the app needs no
+change. Each file loads with the query `?v=<webRuntimeVersion>`. Edit
+`lib/web/*.mjs`, then run `dart run native_prebuilt:web stamp`.
 
 ## Build & test (milestone 1)
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
 tool/build_all_native.sh # all twelve native production tuples
-tool/build_web.sh     # pinned Emscripten ES module + Wasm
+dart run tool/build_web.dart --out <dir> # Emscripten ES module + Wasm
 dart test             # release download/cache, ABI, Dart/FFI/isolate path
-tool/test_all.sh      # VM + Chrome dart2js + Chrome dart2wasm + Safari
+dart run tool/test_all.dart [--web-from <dir>] # VM + Chrome dart2js/dart2wasm + Safari
 dart run tool/prebuilt_artifacts.dart # stage released native files for ABI scripts
 tool/test_ios_simulator.sh
 ZXD_ANDROID_AVD=Medium_Phone_API_36.0 tool/test_android_device.sh
@@ -147,8 +149,8 @@ Web calls use the same C ABI compiled with Emscripten. Each Wasm runtime lives
 in a module Worker; a bounded pool serializes one operation per runtime,
 transfers private call-time snapshots, routes responses by request ID, and
 replaces a Worker that crashes without replaying the failed operation. No CDN
-or platform barcode service is used. The 1.3 MiB Wasm binary and its loader are
-committed package assets with hashes in `native_artifacts/manifest.json`.
+or platform barcode service is used. The 1.3 MiB Wasm binary and its module
+are built by the release workflow and pinned in `native_artifacts/web.json`.
 
 ## Milestones
 

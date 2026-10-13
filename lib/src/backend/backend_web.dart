@@ -5,13 +5,27 @@ import 'dart:typed_data';
 
 import '../models.dart';
 import '../web_config.dart';
+import '../web_runtime.g.dart';
 import 'backend.dart';
 
 /// Must match ZXD_ABI_VERSION and zxing_dart_loader.mjs.
 const _abiVersion = 3;
 
-const _flutterAssetWorkerUrl =
-    'assets/packages/zxing_dart/web/zxing_dart_worker.mjs';
+/// Where the zxing_dart build hook installs the worker in a Flutter web app
+/// (native_prebuilt ADR 002 D1, D8).
+const defaultWorkerUrl = 'native_prebuilt/zxing_dart/zxing_dart_worker.mjs';
+
+/// [workerUri] resolved against [baseUri], with the query
+/// `v=<webRuntimeVersion>` unless it has a `v` query already (ADR 002 D7).
+Uri resolveWorkerUrl(String baseUri, Uri? workerUri) {
+  final resolved = Uri.parse(
+    baseUri,
+  ).resolveUri(workerUri ?? Uri.parse(defaultWorkerUrl));
+  if (resolved.queryParameters.containsKey('v')) return resolved;
+  return resolved.replace(
+    queryParameters: {...resolved.queryParameters, 'v': webRuntimeVersion},
+  );
+}
 
 /// Copy at API-call time into JavaScript-owned memory. Transferring the result
 /// can detach this private snapshot without detaching the caller's Uint8List.
@@ -22,11 +36,10 @@ Future<ZxingBackend> loadBackend() async {
   if (workerCount < 1 || workerCount > 4) {
     throw RangeError.range(workerCount, 1, 4, 'ZxingDartWeb.workerCount');
   }
-  final configuredUri =
-      ZxingDartWeb.workerUri ?? Uri.parse(_flutterAssetWorkerUrl);
-  final workerUrl = Uri.parse(
+  final workerUrl = resolveWorkerUrl(
     _documentBaseUri,
-  ).resolveUri(configuredUri).toString();
+    ZxingDartWeb.workerUri,
+  ).toString();
   final workers = <_WebWorkerBackend>[];
   try {
     for (var index = 0; index < workerCount; index++) {
@@ -443,9 +456,10 @@ final class _WebWorkerBackend implements ZxingBackend {
     final error = ZxingException(
       -2,
       'zxing_dart Worker failed to load from $_workerUrl'
-      '${detail == null || detail.isEmpty ? '' : ': $detail'}. Flutter web '
-      'apps bundle it automatically; other embedders must serve '
-      'package:zxing_dart/web/ and set ZxingDartWeb.workerUri.',
+      '${detail == null || detail.isEmpty ? '' : ': $detail'}. In a Flutter '
+      'web app, the zxing_dart build hook installs it in '
+      'web/native_prebuilt/zxing_dart/. Other embedders must serve those '
+      'files and set ZxingDartWeb.workerUri.',
     );
     final wasIdle = _pending.isEmpty;
     terminate(error);

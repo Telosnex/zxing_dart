@@ -1,5 +1,6 @@
-# Native inputs: CMakeLists.txt, src/, hook/, pubspec.yaml, build/fetch scripts.
-# Web runtime delivery remains static until Flutter stable supports data assets.
+# Native and web inputs: CMakeLists.txt, src/, hook/, pubspec.yaml, and the
+# build and fetch scripts, including tool/build_web.dart (native_prebuilt
+# ADR 002 D5).
 analysis_options.yaml
 dart_test.yaml
 ffigen.yaml
@@ -25,10 +26,9 @@ tool/build_all_native.sh
 tool/build_macos.sh
 tool/build_native_linux_docker.sh
 tool/build_native_windows_docker.sh
-tool/build_web.sh
 tool/render_synthetic_case.dart
 tool/safari_test_launcher.sh
-tool/test_all.sh
+tool/test_all.dart
 tool/test_android_device.sh
 tool/test_ios_simulator.sh
 tool/test_linux_dart_docker.sh

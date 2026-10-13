@@ -12,9 +12,11 @@ abstract final class ZxingDartWeb {
 
   /// Override the URL of `zxing_dart_worker.mjs`.
   ///
-  /// Flutter web bundles the worker, loader, generated module, and Wasm binary
-  /// under `assets/packages/zxing_dart/web/`, which is the default. Plain Dart
-  /// browser embedders should serve `lib/web/` same-origin and set this URI.
-  /// All four files must remain siblings. Set before the first operation.
+  /// In a Flutter web build, the zxing_dart build hook installs the worker,
+  /// loader, generated module, and Wasm binary in
+  /// `web/native_prebuilt/zxing_dart/`, which is the default (native_prebuilt
+  /// ADR 002). Other browser embedders serve the four files same-origin, as
+  /// siblings, and set this URI. The query `v=<webRuntimeVersion>` is added
+  /// unless the URI has a `v` query. Set before the first operation.
   static Uri? workerUri;
 }

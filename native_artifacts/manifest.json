@@ -4,26 +4,5 @@
   "sources": {
     "zxing-cpp": "287c85df6f961c8efbfb5ffd736cd9457b8b890e",
     "zint": "55541e139e62b9209b71cd9b0ba9010cec28b1d9"
-  },
-  "toolchains": {
-    "web": "Emscripten 5.0.0 a7c5deabd7c88ba1c38ebe988112256775f944c6"
-  },
-  "web": {
-    "loader": {
-      "path": "lib/web/zxing_dart_loader.mjs",
-      "sha256": "9e9b38f9badd64682b6e72dd37666aa42d0a96d0ccbe448848516c325b9b8386"
-    },
-    "worker": {
-      "path": "lib/web/zxing_dart_worker.mjs",
-      "sha256": "0f7bc65f4b4db9a3290e1b5c3935805644eb642251ea109ac374469d5ccf69f4"
-    },
-    "module": {
-      "path": "lib/web/zxing_dart_module.mjs",
-      "sha256": "029e37a507a94a1f236b6f56585b5e1b47b474e68fdabf52db8f7d61bfbfd046"
-    },
-    "wasm": {
-      "path": "lib/web/zxing_dart_module.wasm",
-      "sha256": "ea57c8ed956231687e3ea6f489156d106905c4caf7af0d3d5ddd10b4055b087f"
-    }
   }
 }

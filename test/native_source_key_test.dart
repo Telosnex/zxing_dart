@@ -27,7 +27,7 @@ void main() {
     await file.writeAsString(contents);
   }
 
-  test('source key covers the entire native build recipe', () {
+  test('source key covers the entire native and web build recipe', () {
     expect(
       original.files.map((f) => f.path),
       containsAll([
@@ -38,6 +38,7 @@ void main() {
         'src/zxing_dart.cpp',
         'src/exports_windows.def',
         'tool/build_native_artifact.sh',
+        'tool/build_web.dart',
         'tool/fetch_zxing.sh',
         'tool/install_build_toolchain.sh',
       ]),
@@ -55,7 +56,9 @@ void main() {
     () async {
       for (final path in [
         'lib/web/zxing_dart_module.wasm',
+        'lib/web/zxing_dart_worker.mjs',
         'native_artifacts/prebuilt.json',
+        'native_artifacts/web.json',
         'native_artifacts/manifest.json',
         'third_party/zxing-cpp/core/generated.cpp',
         'build/native_artifacts/macos-arm64/libzxing_dart.dylib',
@@ -68,10 +71,11 @@ void main() {
   );
 
   test(
-    'native source or toolchain recipe changes invalidate release',
+    'native source, web build or toolchain recipe changes invalidate release',
     () async {
       for (final path in [
         'src/zxing_dart.cpp',
+        'tool/build_web.dart',
         'tool/install_build_toolchain.sh',
       ]) {
         final file = File.fromUri(fixture.uri.resolve(path));

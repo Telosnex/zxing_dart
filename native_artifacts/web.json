@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "webVersion": "f73b9c6697b3b0ec",
+  "files": [
+    {
+      "name": "zxing_dart_loader.mjs",
+      "sha256": "9e9b38f9badd64682b6e72dd37666aa42d0a96d0ccbe448848516c325b9b8386",
+      "bytes": 5827,
+      "source": "lib/web/zxing_dart_loader.mjs"
+    },
+    {
+      "name": "zxing_dart_worker.mjs",
+      "sha256": "bff3ab1f273149ebf652616304e1530955913626edb482f5769fb72c457390c8",
+      "bytes": 2480,
+      "source": "lib/web/zxing_dart_worker.mjs"
+    }
+  ]
+}

@@ -65,7 +65,7 @@ movement.
 
 ## Execution matrix
 
-`tool/test_all.sh` runs the same corpus through:
+`dart run tool/test_all.dart` runs the same corpus through:
 
 - native Dart VM / FFI / helper isolate;
 - Chrome dart2js / Wasm Worker;

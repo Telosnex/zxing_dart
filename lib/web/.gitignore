@@ -1,0 +1,5 @@
+# native_prebuilt web install-dev: generated, do not edit.
+/.native_prebuilt_web_version
+/zxing_dart_module.mjs
+/zxing_dart_module.wasm
+# End of native_prebuilt web install-dev.

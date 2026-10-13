@@ -1,12 +1,16 @@
-# Native releases and bundled web runtime
+# Native and web releases
 
 `prebuilt.json` pins SHA-256-verified native libraries from an immutable GitHub
-release, keyed by native build inputs. `manifest.json` retains the upstream
-pins and four committed web-file hashes. Native binaries are no longer in Git.
+release, keyed by the build inputs. `web.json` pins the web runtime files of
+the same release: the generated Emscripten module and Wasm binary, and the
+hand-written worker and loader in `lib/web/` (native_prebuilt ADR 002).
+`manifest.json` holds the upstream pins. No binary is in Git.
 
 The release workflow runs the **same hook and source build** as local builds:
-`dart run native_prebuilt:build`. All 12 jobs must pass and agree on the source
-key before publication. Only the repository owner can publish. Dry runs upload
+`dart run native_prebuilt:build`. It builds the web files with
+`tool/build_web.dart` in the pinned `emscripten/emsdk:5.0.0` image and runs the
+browser tests on them. All 13 jobs must pass and agree on the source key
+before publication. Only the repository owner can publish. Dry runs upload
 Actions artifacts but do not create releases or push a manifest branch.
 
 ## Sources and runtime requirements
@@ -14,7 +18,7 @@ Actions artifacts but do not create releases or push a manifest branch.
 - zxing-cpp v3.1.1: `287c85df6f961c8efbfb5ffd736cd9457b8b890e`
 - zint v2.16.0: `55541e139e62b9209b71cd9b0ba9010cec28b1d9`
 - ABI 3, native profile 5, exactly seven `zxd_*` exports
-- Web remains Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)
+- Web: Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)
 
 | Target | Minimum | Release builder |
 |---|---|---|
@@ -42,8 +46,17 @@ dart run native_prebuilt:build --target macos-arm64 \
 dart run native_prebuilt:check --download
 dart test
 
-# Web stays bundled in the package:
+# Upstream pins and profile:
 dart run tool/verify_artifacts.dart
+
+# Web files: install them into lib/web/ for the browser tests, from the
+# release or from a local build (needs Emscripten 5.0.0):
+dart run native_prebuilt:web install-dev
+dart run tool/build_web.dart --out /tmp/zxd_web
+dart run native_prebuilt:web install-dev --from /tmp/zxd_web
+
+# After a change to lib/web/zxing_dart_worker.mjs or zxing_dart_loader.mjs:
+dart run native_prebuilt:web stamp
 
 # Standalone builds go to ignored build/native_artifacts/<target>/:
 tool/build_native_artifact.sh macos-arm64
