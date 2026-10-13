@@ -1,12 +1,32 @@
 {
   "schema": 1,
-  "webVersion": "f73b9c6697b3b0ec",
+  "sourceKey": "3ae1347f736a5a729fbb116358c6976e0e1dbbecedb53fd91717c141779364bc",
+  "release": "https://github.com/Telosnex/zxing_dart/releases/tag/native-3ae1347f736a5a72",
+  "runner": "ubuntu-24.04, emscripten/emsdk@sha256:67df07bc59f86685818fa801d340b54e576fe4276cfd3bcfc4da61d564217737",
+  "toolchain": "Emscripten 5.0.0 (a7c5deabd7c88ba1c38ebe988112256775f944c6)",
+  "webVersion": "e56919378608001e",
   "files": [
     {
       "name": "zxing_dart_loader.mjs",
       "sha256": "9e9b38f9badd64682b6e72dd37666aa42d0a96d0ccbe448848516c325b9b8386",
       "bytes": 5827,
       "source": "lib/web/zxing_dart_loader.mjs"
+    },
+    {
+      "name": "zxing_dart_module.mjs",
+      "sha256": "029e37a507a94a1f236b6f56585b5e1b47b474e68fdabf52db8f7d61bfbfd046",
+      "bytes": 23141,
+      "source": "release",
+      "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/web-zxing_dart_module.mjs.gz",
+      "downloadSha256": "287613fdb030766c3c3709ec980b8bde769e5aef685e699ad0994a5010e89f76"
+    },
+    {
+      "name": "zxing_dart_module.wasm",
+      "sha256": "a4db85c5031fbcdcb6fab0034364bad86149ad85b9cbc3466a5bff21f138f716",
+      "bytes": 1330977,
+      "source": "release",
+      "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/web-zxing_dart_module.wasm.gz",
+      "downloadSha256": "31ba17a1243002dd6dabfb032c221914c8f93d0b1842a7048f0ec7bb1ba95392"
     },
     {
       "name": "zxing_dart_worker.mjs",
