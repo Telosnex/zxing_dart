@@ -25,8 +25,10 @@ Apple targets require Xcode. Android targets require ANDROID_NDK_HOME or a
 standard Android SDK installation. Linux/Windows targets use Linux compilers
 directly or the provided pinned Docker wrappers.
 
-The hook sets ZXD_THIRD_PARTY, ZXD_BUILD_ROOT and ZXD_OUTPUT to paths outside
-package sources. Optional ZXD_MACOS_VERSION, ZXD_IOS_VERSION, ZXD_ANDROID_API
+The hook sets ZXD_ZXING_SOURCE (the pinned zxing-cpp checkout from
+native_artifacts/sources.json; nothing is fetched), ZXD_BUILD_ROOT and
+ZXD_OUTPUT to paths outside package sources. Without ZXD_ZXING_SOURCE, the
+script fetches zxing-cpp into ZXD_THIRD_PARTY (default: third_party). Optional ZXD_MACOS_VERSION, ZXD_IOS_VERSION, ZXD_ANDROID_API
 select minimum OS versions (defaults: 12.0, 13.0, 24).
 EOF
   exit 64
@@ -37,13 +39,12 @@ case "$target" in
   *) usage ;;
 esac
 
-# The hook fetches under a shared lock before building targets concurrently.
-if [[ "${ZXD_SKIP_FETCH:-0}" != 1 ]]; then
+if [[ -z "${ZXD_ZXING_SOURCE:-}" && "${ZXD_SKIP_FETCH:-0}" != 1 ]]; then
   bash "$root/tool/fetch_zxing.sh"
 fi
-third_party="${ZXD_THIRD_PARTY:-$root/third_party}"
-[[ "$(git -C "$third_party/zxing-cpp" rev-parse HEAD)" == 287c85df6f961c8efbfb5ffd736cd9457b8b890e ]]
-[[ "$(git -C "$third_party/zxing-cpp/zint" rev-parse HEAD)" == 55541e139e62b9209b71cd9b0ba9010cec28b1d9 ]]
+zxing_source="${ZXD_ZXING_SOURCE:-${ZXD_THIRD_PARTY:-$root/third_party}/zxing-cpp}"
+[[ "$(git -C "$zxing_source" rev-parse HEAD)" == 287c85df6f961c8efbfb5ffd736cd9457b8b890e ]]
+[[ "$(git -C "$zxing_source/zint" rev-parse HEAD)" == 55541e139e62b9209b71cd9b0ba9010cec28b1d9 ]]
 macos_version="${ZXD_MACOS_VERSION:-12.0}"
 ios_version="${ZXD_IOS_VERSION:-13.0}"
 command -v cmake >/dev/null || { echo 'cmake is required' >&2; exit 1; }
@@ -51,7 +52,7 @@ command -v cmake >/dev/null || { echo 'cmake is required' >&2; exit 1; }
 build_dir="${ZXD_BUILD_ROOT:-$root/build/native/$target-v$profile_version}"
 cmake_args=(
   -DCMAKE_BUILD_TYPE=Release
-  -DZXD_ZXING_SOURCE="$third_party/zxing-cpp"
+  -DZXD_ZXING_SOURCE="$zxing_source"
   -DZXD_BUILD_TESTS=OFF
   -DZXING_EXAMPLES=OFF
   -DZXING_UNIT_TESTS=OFF

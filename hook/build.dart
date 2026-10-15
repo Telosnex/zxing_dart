@@ -4,7 +4,9 @@
 /// the library from the GitHub release in native_artifacts/prebuilt.json when
 /// the package sources match it (user define `native_build`: auto, download or
 /// source). Otherwise it runs tool/build_native_artifact.sh, which needs CMake,
-/// git and the target compiler. Apple targets build on macOS, Android targets
+/// git and the target compiler. zxing-cpp comes from the pinned source in
+/// native_artifacts/sources.json (fetched once into the native_prebuilt cache,
+/// or put there by a packager for a build without network). Apple targets build on macOS, Android targets
 /// on macOS or Linux, and Linux and Windows targets on Linux (Windows with
 /// MinGW).
 ///
@@ -63,7 +65,7 @@ void main(List<String> args) async {
       input: input,
       output: output,
       log: _log,
-    ).run((_) => _buildFromSource(input, output, target));
+    ).run((source) => _buildFromSource(input, output, target, source));
     _log('Hook completed in ${_formatDuration(stopwatch.elapsed)}');
   });
 }
@@ -74,6 +76,7 @@ Future<void> _buildFromSource(
   BuildInput input,
   BuildOutputBuilder output,
   TargetName target,
+  SourceBuild source,
 ) async {
   final hostProblem = _hostProblem(target);
   if (hostProblem != null) throw UnsupportedError('zxing_dart: $hostProblem');
@@ -81,8 +84,9 @@ Future<void> _buildFromSource(
   final code = input.config.code;
   final packageRoot = input.packageRoot;
   final shared = input.outputDirectoryShared;
+  final zxing = await source.pinnedSource('zxing-cpp');
   final environment = {
-    'ZXD_THIRD_PARTY': shared.resolve('sources').toFilePath(),
+    'ZXD_ZXING_SOURCE': zxing.path,
     'ZXD_BUILD_JOBS': '${Platform.numberOfProcessors}',
     if (target.os == OS.macOS)
       'ZXD_MACOS_VERSION': '${code.macOS.targetVersion}.0',
@@ -93,18 +97,14 @@ Future<void> _buildFromSource(
     },
   };
 
-  // The pinned sources are shared by every target of this app. Two targets
-  // can build at once, so a lock guards the fetch and each build directory.
-  await _withLock(File.fromUri(shared.resolve('sources.lock')), () async {
-    await _run('Fetching the pinned sources', packageRoot, [
-      'tool/fetch_zxing.sh',
-    ], environment);
-  });
-
+  // Two targets can build at once, so a lock guards each build directory.
   // The build directory is isolated by target, settings, build scripts and compiler.
   // The script performs a clean build and validates the seven-symbol ABI.
   final scripts = [
-    for (final path in ['tool/build_native_artifact.sh', 'tool/fetch_zxing.sh'])
+    for (final path in [
+      'tool/build_native_artifact.sh',
+      'native_artifacts/sources.json',
+    ])
       await File.fromUri(packageRoot.resolve(path)).readAsString(),
   ];
   final buildKey = sha256
@@ -136,7 +136,6 @@ Future<void> _buildFromSource(
         ...environment,
         'ZXD_BUILD_ROOT': buildRoot.toFilePath(),
         'ZXD_OUTPUT': library.path,
-        'ZXD_SKIP_FETCH': '1',
       },
     ),
   );
@@ -251,7 +250,7 @@ Future<void> _run(
   final stopwatch = Stopwatch()..start();
   // bash runs the script, so the file mode of a checkout does not matter.
   final process = await Process.start(
-    'bash',
+    bashExecutable(),
     bashArguments,
     workingDirectory: packageRoot.toFilePath(),
     environment: environment,
