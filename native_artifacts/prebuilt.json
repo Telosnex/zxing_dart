@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceKey": "3ae1347f736a5a729fbb116358c6976e0e1dbbecedb53fd91717c141779364bc",
-  "release": "https://github.com/Telosnex/zxing_dart/releases/tag/native-3ae1347f736a5a72",
+  "sourceKey": "dec485c082f8852261187f9812e1da39778765c71495804745d7e6d50b36e9da",
+  "release": "https://github.com/Telosnex/zxing_dart/releases/tag/native-dec485c082f88522",
   "targets": {
     "android-arm": {
       "runner": "ubuntu-22.04",
@@ -10,9 +10,9 @@
       "files": [
         {
           "name": "libzxing_dart.so",
-          "sha256": "353352226e425834780d41a7184804524260cbf97bf82188b8cbf64843dc8e45",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/android-arm-libzxing_dart.so.gz",
-          "downloadSha256": "fdbca39a75726894df3be5c184d114623f25f109de5e3f04818cf82c6185d5d2",
+          "sha256": "39cba854276a4d76b39042a68b01fa94ef250b82a8c638f686560510a18326a0",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/android-arm-libzxing_dart.so.gz",
+          "downloadSha256": "77d4261d243ca433192779cc2b2daa0720e4af18b39fae3308457d777c23bba9",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
         }
@@ -25,9 +25,9 @@
       "files": [
         {
           "name": "libzxing_dart.so",
-          "sha256": "96b32af4b904d34df1f71a684fa915f167697ae8287bdabe6896570e1e19e2a0",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/android-arm64-libzxing_dart.so.gz",
-          "downloadSha256": "9f5fc5eaff62cdb8a9dd32b767c22c05d52659c47ea184e4a79f15fa96d37812",
+          "sha256": "28c662e94047d6d778b9019883f6f1ecf79365db533c2510fddfaf77116bf811",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/android-arm64-libzxing_dart.so.gz",
+          "downloadSha256": "b94a01f89583175552ae79fc57070507c31d1cbf0d10aa143219a65b20fd085f",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
         }
@@ -40,9 +40,9 @@
       "files": [
         {
           "name": "libzxing_dart.so",
-          "sha256": "899cf7c2cbada7deda1cc4b55320557c372467ec8e7c57bd9f97896ed523a227",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/android-x64-libzxing_dart.so.gz",
-          "downloadSha256": "c3042f0732ec169419d2b5076e9eb0594dbba105985cac351d4487c782a9f7d1",
+          "sha256": "3f3355af2f447b32ace55214149025a2230b6b9afca7b0e4de5ded029b1f4c74",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/android-x64-libzxing_dart.so.gz",
+          "downloadSha256": "c73711b1d506adbf00b22b511e31c25143473052d6d31e32e4a9cd6c45df903f",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
         }
@@ -56,7 +56,7 @@
         {
           "name": "libzxing_dart.dylib",
           "sha256": "e8a4a38dee4b40f4f05dc6c5cec727e9d9c39756dafca7f19967ecc7821a264a",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/ios-arm64-iphoneos-libzxing_dart.dylib.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/ios-arm64-iphoneos-libzxing_dart.dylib.gz",
           "downloadSha256": "aa0c1273e5b53dd2c3b0e345fa3a2546f5a1906dce92253bdcb1128cb06c732e",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -71,7 +71,7 @@
         {
           "name": "libzxing_dart.dylib",
           "sha256": "31bc39491f8478b914fe069bbd047daa667e7f30b921ef760d014095d8c33cd2",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/ios-arm64-iphonesimulator-libzxing_dart.dylib.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/ios-arm64-iphonesimulator-libzxing_dart.dylib.gz",
           "downloadSha256": "49c3330fb14ad9679e195f1642db0e5d25a1f20ef688a5282a0c3c37d78857f0",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -86,7 +86,7 @@
         {
           "name": "libzxing_dart.dylib",
           "sha256": "d88b0ed711f3fd5266b20f38ed0bc3cc33305e3507e983daf79030f6085bee5b",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/ios-x64-iphonesimulator-libzxing_dart.dylib.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/ios-x64-iphonesimulator-libzxing_dart.dylib.gz",
           "downloadSha256": "7fbbb9e16efe5cc9980d9228336bf7021aa44f0a2288d2a086079f417ea7b02d",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -100,7 +100,7 @@
         {
           "name": "libzxing_dart.so",
           "sha256": "666193bb87ffa396de8ea503728d7b1b44a264f0ee62cc012d8f82671da46886",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/linux-arm64-libzxing_dart.so.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/linux-arm64-libzxing_dart.so.gz",
           "downloadSha256": "6e1ea9da631fc5d5c54ec009a2b161dd153908b5a0191f38c5171818bbb9055c",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -114,7 +114,7 @@
         {
           "name": "libzxing_dart.so",
           "sha256": "01f7be2623fdd4cbd8d7122ef375787687d2abd740484d53302daa987471f30b",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/linux-x64-libzxing_dart.so.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/linux-x64-libzxing_dart.so.gz",
           "downloadSha256": "21176f52fd174b128b10f4c0005c6bb7c3c5146dcec45403ef5b0e09e662ecb9",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -129,7 +129,7 @@
         {
           "name": "libzxing_dart.dylib",
           "sha256": "0b0028cbe7223610b150fdbea574035e9c6b9c9b73e75874dd560571b16e260c",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/macos-arm64-libzxing_dart.dylib.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/macos-arm64-libzxing_dart.dylib.gz",
           "downloadSha256": "0af066add858b3d9e390efe6caea9cb08d3cf9014e572284627d727c642c1f9e",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -144,7 +144,7 @@
         {
           "name": "libzxing_dart.dylib",
           "sha256": "873371d397bc9ea18e2e1ef90b3d83d96c5ed22ea17b020785aaacf62446da2e",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/macos-x64-libzxing_dart.dylib.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/macos-x64-libzxing_dart.dylib.gz",
           "downloadSha256": "c2a0fb9743e3dd27b1c438de9a661dfa3fc9d72f8e0a707fa44195b993c1410d",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -158,7 +158,7 @@
         {
           "name": "zxing_dart.dll",
           "sha256": "213903c0201c3851ab395a704d8ab366fe7a063855c12e5c674db8301c42be8f",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/windows-arm64-zxing_dart.dll.gz",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/windows-arm64-zxing_dart.dll.gz",
           "downloadSha256": "b416688754fd91e198da462a6cf9acc1fa3fe476a3fea123351aa28b95e61f4f",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
@@ -171,9 +171,9 @@
       "files": [
         {
           "name": "zxing_dart.dll",
-          "sha256": "70f366037626a191c095a3c7bc4ebda9d804390e7eb08e927430448ba739e41c",
-          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-3ae1347f736a5a72/windows-x64-zxing_dart.dll.gz",
-          "downloadSha256": "f3cdc8f1ee19d9db8e506a58b9f668f8feef350b4e954b7c5721117166e49482",
+          "sha256": "3404bf28b2aabdca635b2dcb28b01814becc95e938f31835737c027d60351627",
+          "url": "https://github.com/Telosnex/zxing_dart/releases/download/native-dec485c082f88522/windows-x64-zxing_dart.dll.gz",
+          "downloadSha256": "222b12300d9cc0b9a8b1a84facb18c165544aaaded69ac0c42cd168945045959",
           "delivery": "bundle",
           "asset": "zxing_dart_bindings_generated.dart"
         }
