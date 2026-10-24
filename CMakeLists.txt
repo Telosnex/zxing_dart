@@ -29,7 +29,7 @@ endif()
 add_subdirectory("${ZXD_ZXING_SOURCE}/core" third_party/zxing-cpp/core EXCLUDE_FROM_ALL)
 
 if(EMSCRIPTEN)
-  # tool/build_web.dart performs the final Emscripten ES-module link explicitly.
+  # tool/kiln/build_web.dart performs the final Emscripten ES-module link explicitly.
   add_library(zxing_dart STATIC src/zxing_dart.cpp)
 else()
   add_library(zxing_dart SHARED src/zxing_dart.cpp)

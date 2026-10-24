@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import 'package:zxing_dart/src/backend/backend_web.dart';
 import 'package:zxing_dart/src/web_runtime.g.dart';
 
-/// native_prebuilt ADR 002 D7 and I3: every web runtime file loads with the
+/// kiln ADR 002 D7 and I3: every web runtime file loads with the
 /// query `v=<webRuntimeVersion>`, so a browser does not use a cached file of
 /// another version.
 void main() {
@@ -16,7 +16,7 @@ void main() {
     const base = 'https://app.example/sub/';
     expect(
       resolveWorkerUrl(base, null).toString(),
-      '${base}native_prebuilt/zxing_dart/zxing_dart_worker.mjs'
+      '${base}kiln/zxing_dart/zxing_dart_worker.mjs'
       '?v=$webRuntimeVersion',
     );
     expect(resolveWorkerUrl(base, Uri.parse('w/x.mjs?a=1')).queryParameters, {

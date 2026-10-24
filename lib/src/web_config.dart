@@ -14,7 +14,7 @@ abstract final class ZxingDartWeb {
   ///
   /// In a Flutter web build, the zxing_dart build hook installs the worker,
   /// loader, generated module, and Wasm binary in
-  /// `web/native_prebuilt/zxing_dart/`, which is the default (native_prebuilt
+  /// `web/kiln/zxing_dart/`, which is the default (kiln
   /// ADR 002). Other browser embedders serve the four files same-origin, as
   /// siblings, and set this URI. The query `v=<webRuntimeVersion>` is added
   /// unless the URI has a `v` query. Set before the first operation.

@@ -3,14 +3,14 @@
 `prebuilt.json` pins SHA-256-verified native libraries from an immutable GitHub
 release, keyed by the build inputs. `web.json` pins the web runtime files of
 the same release: the generated Emscripten module and Wasm binary, and the
-hand-written worker and loader in `lib/web/` (native_prebuilt ADR 002).
+hand-written worker and loader in `lib/web/` (kiln ADR 002).
 `manifest.json` holds the upstream pins. No binary is in Git.
 
 The release workflow runs the **same hook and source build** as local builds:
-`dart run native_prebuilt:build`. It builds the web files with
-`tool/build_web.dart` in the pinned `emscripten/emsdk:5.0.0` image and runs the
-browser tests on them. All 13 jobs must pass and agree on the source key
-before publication. Only the repository owner can publish. Dry runs upload
+`dart run kiln:build`. It builds the web files with
+`tool/kiln/build_web.dart` in the pinned `emscripten/emsdk:5.0.0` image and runs the
+browser tests on them. All jobs must pass and agree on the source key
+before publication (`.github/workflows/kiln_release.yml`). Only the repository owner can publish. Dry runs upload
 Actions artifacts but do not create releases or push a manifest branch.
 
 ## Sources and runtime requirements
@@ -39,11 +39,11 @@ Exact runner/compiler metadata and artifact hashes are in `prebuilt.json`.
 
 ```sh
 # Same hook entrypoint as Actions (needs Xcode on this target):
-dart run native_prebuilt:build --target macos-arm64 \
+dart run kiln:build --target macos-arm64 \
   --repo Telosnex/zxing_dart --out /tmp/zxing-macos
 
 # Download/cache path, with source-key and SHA-256 checks:
-dart run native_prebuilt:check --download
+dart run kiln:check --download
 dart test
 
 # Upstream pins and profile:
@@ -51,12 +51,12 @@ dart run tool/verify_artifacts.dart
 
 # Web files: install them into lib/web/ for the browser tests, from the
 # release or from a local build (needs Emscripten 5.0.0):
-dart run native_prebuilt:web install-dev
-dart run tool/build_web.dart --out /tmp/zxd_web
-dart run native_prebuilt:web install-dev --from /tmp/zxd_web
+dart run kiln:web install-dev
+dart run tool/kiln/build_web.dart --out /tmp/zxd_web
+dart run kiln:web install-dev --from /tmp/zxd_web
 
 # After a change to lib/web/zxing_dart_worker.mjs or zxing_dart_loader.mjs:
-dart run native_prebuilt:web stamp
+dart run kiln:web stamp
 
 # Standalone builds go to ignored build/native_artifacts/<target>/:
 tool/build_native_artifact.sh macos-arm64

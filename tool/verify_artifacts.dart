@@ -28,8 +28,8 @@ Future<void> main() async {
   }
   if (manifest.containsKey('web')) {
     throw const FormatException(
-      'Web files belong in native_artifacts/web.json (native_prebuilt '
-      'ADR 002). native_prebuilt:check verifies them.',
+      'Web files belong in native_artifacts/web.json (kiln '
+      'ADR 002). kiln:check verifies them.',
     );
   }
   stdout.writeln('OK sources and profile');
