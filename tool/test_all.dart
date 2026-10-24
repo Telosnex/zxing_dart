@@ -3,7 +3,7 @@
 /// Safari on macOS (set ZXD_SKIP_SAFARI=1 to skip Safari).
 ///
 /// The browser tests load the web files from lib/web/, so the generated files
-/// are installed first (native_prebuilt ADR 002 D13):
+/// are installed first (kiln ADR 002 D13):
 ///
 ///     dart run tool/test_all.dart                     # files of web.json
 ///     dart run tool/test_all.dart --web-from <dir>    # a local web build
@@ -21,10 +21,10 @@ Future<void> main(List<String> args) async {
 
   await _run(['analyze']);
   await _run(['run', 'tool/verify_artifacts.dart']);
-  await _run(['run', 'native_prebuilt:check']);
+  await _run(['run', 'kiln:check']);
   await _run([
     'run',
-    'native_prebuilt:web',
+    'kiln:web',
     'install-dev',
     if (webFrom != null) ...['--from', webFrom],
   ]);

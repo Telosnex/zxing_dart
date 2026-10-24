@@ -3,7 +3,7 @@ library;
 
 import 'dart:io';
 
-import 'package:native_prebuilt/native_prebuilt.dart';
+import 'package:kiln/kiln.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -38,7 +38,7 @@ void main() {
         'src/zxing_dart.cpp',
         'src/exports_windows.def',
         'tool/build_native_artifact.sh',
-        'tool/build_web.dart',
+        'tool/kiln/build_web.dart',
         'tool/fetch_zxing.sh',
         'tool/install_build_toolchain.sh',
       ]),
@@ -62,7 +62,7 @@ void main() {
         'native_artifacts/manifest.json',
         'third_party/zxing-cpp/core/generated.cpp',
         'build/native_artifacts/macos-arm64/libzxing_dart.dylib',
-        '.github/workflows/native_release.yml',
+        '.github/workflows/kiln_release.yml',
       ]) {
         await write(path, 'not a native build input');
       }
@@ -75,7 +75,7 @@ void main() {
     () async {
       for (final path in [
         'src/zxing_dart.cpp',
-        'tool/build_web.dart',
+        'tool/kiln/build_web.dart',
         'tool/install_build_toolchain.sh',
       ]) {
         final file = File.fromUri(fixture.uri.resolve(path));

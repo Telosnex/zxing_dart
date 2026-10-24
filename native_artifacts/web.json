@@ -4,7 +4,7 @@
   "release": "https://github.com/Telosnex/zxing_dart/releases/tag/native-dec485c082f88522",
   "runner": "ubuntu-24.04, emscripten/emsdk@sha256:67df07bc59f86685818fa801d340b54e576fe4276cfd3bcfc4da61d564217737",
   "toolchain": "Emscripten 5.0.0 (a7c5deabd7c88ba1c38ebe988112256775f944c6)",
-  "webVersion": "e56919378608001e",
+  "webVersion": "9a0e250b4cae17e7",
   "files": [
     {
       "name": "zxing_dart_loader.mjs",
@@ -30,8 +30,8 @@
     },
     {
       "name": "zxing_dart_worker.mjs",
-      "sha256": "bff3ab1f273149ebf652616304e1530955913626edb482f5769fb72c457390c8",
-      "bytes": 2480,
+      "sha256": "86f533a0f50b48f57e966e15994a922c7b2cfe94b1af73e662326f3681dabf50",
+      "bytes": 2469,
       "source": "lib/web/zxing_dart_worker.mjs"
     }
   ]

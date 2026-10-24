@@ -67,9 +67,9 @@ Pin bumps are reviewed changes accompanied by a full conformance run.
 
 ## Native builds and releases
 
-Native libraries are built by `.github/workflows/native_release.yml` for all
+Native libraries are built by `.github/workflows/kiln_release.yml` for all
 12 supported targets, then published as an immutable GitHub release. The build
-hook uses `native_prebuilt` (the same flow as image_ffmpeg, fllama and fonnx):
+hook uses `kiln` (the same flow as image_ffmpeg, fllama and fonnx):
 matching sources download verified libraries into a shared cache; modified
 native sources build locally. No Docker/compiler installation is needed to
 consume a matching release. Windows source builds currently require a Linux
@@ -82,27 +82,27 @@ hooks:
       native_build: auto # default; also download (fail closed) or source
 ```
 
-Run the **native release** Actions workflow, or push to `native-release`.
-`native-release-dry` builds and assembles the manifest without publishing.
-Merge the generated `native-manifest/<tag>` branch to adopt a release.
+Run the **Kiln release** Actions workflow, or push to `kiln-release`.
+`kiln-release-dry` builds and assembles the manifest without publishing.
+Merge the generated `kiln-manifest/<tag>` branch to adopt a release.
 
 ```sh
-dart run native_prebuilt:check --download # source key + every released hash
-dart run native_prebuilt:key --list      # inputs that determine the release
+dart run kiln:check --download # source key + every released hash
+dart run kiln:key --list      # inputs that determine the release
 ```
 
-The same release holds the web runtime (native_prebuilt ADR 002). In a
+The same release holds the web runtime (kiln ADR 002). In a
 Flutter web build, the package hook installs the worker, loader, module and
-Wasm binary in `web/native_prebuilt/zxing_dart/` of the app; the app needs no
+Wasm binary in `web/kiln/zxing_dart/` of the app; the app needs no
 change. Each file loads with the query `?v=<webRuntimeVersion>`. Edit
-`lib/web/*.mjs`, then run `dart run native_prebuilt:web stamp`.
+`lib/web/*.mjs`, then run `dart run kiln:web stamp`.
 
 ## Build & test (milestone 1)
 
 ```bash
 tool/build_macos.sh   # fetch pin, build, run native smoke test
 tool/build_all_native.sh # all twelve native production tuples
-dart run tool/build_web.dart --out <dir> # Emscripten ES module + Wasm
+dart run tool/kiln/build_web.dart --out <dir> # Emscripten ES module + Wasm
 dart test             # release download/cache, ABI, Dart/FFI/isolate path
 dart run tool/test_all.dart [--web-from <dir>] # VM + Chrome dart2js/dart2wasm + Safari
 dart run tool/prebuilt_artifacts.dart # stage released native files for ABI scripts

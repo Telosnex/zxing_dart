@@ -1,12 +1,13 @@
 /// Builds the pinned zxing-cpp and the zxing_dart shim as one Emscripten ES
 /// module: zxing_dart_module.mjs and zxing_dart_module.wasm in --out.
 ///
-/// The release workflow runs it in the pinned emscripten/emsdk image
-/// (native_prebuilt ADR 002 D10). For a local build, activate the Emscripten
-/// SDK, or put it at ../emsdk, then install the files with
+/// The kiln release workflow runs it in the pinned emscripten/emsdk image
+/// (kiln ADR 002 D10). --toolchain-file gets the Emscripten version for
+/// web.json. For a local build, activate the Emscripten SDK, or put it at
+/// ../emsdk, then install the files with
 ///
-///     dart run tool/build_web.dart --out /tmp/zxd_web
-///     dart run native_prebuilt:web install-dev --from /tmp/zxd_web
+///     dart run tool/kiln/build_web.dart --out /tmp/zxd_web
+///     dart run kiln:web install-dev --from /tmp/zxd_web
 library;
 
 import 'dart:io';
@@ -14,10 +15,14 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 
 const _usage =
-    'dart run tool/build_web.dart --out <dir> [--work <dir>]\n'
-    '  --out   Directory for the two generated files. It must be empty or '
-    'hold only these files.\n'
-    '  --work  CMake build directory. Default: build/web.';
+    'dart run tool/kiln/build_web.dart --out <dir> [--work <dir>] '
+    '[--toolchain-file <file>]\n'
+    '  --out             Directory for the two generated files. It must be '
+    'empty or hold only these files.\n'
+    '  --work            CMake build directory. Default: build/web, or '
+    r'$RUNNER_TEMP/zxd-web-build in GitHub Actions.'
+    '\n'
+    '  --toolchain-file  Gets the Emscripten version.';
 
 const _outputs = ['zxing_dart_module.mjs', 'zxing_dart_module.wasm'];
 
@@ -36,9 +41,19 @@ const _exportedFunctions = [
 
 Future<void> main(List<String> args) async {
   final options = _parse(args);
-  final root = Directory.fromUri(Platform.script.resolve('..')).absolute.path;
+  final root = Directory.fromUri(
+    Platform.script.resolve('../..'),
+  ).absolute.path;
   final out = Directory(options['out']!).absolute;
-  final work = Directory(options['work'] ?? '$root/build/web').absolute;
+  // In GitHub Actions, the fetched and built files stay out of the checkout.
+  final runnerTemp = Platform.environment['RUNNER_TEMP'];
+  final work = Directory(
+    options['work'] ??
+        (runnerTemp == null ? '$root/build/web' : '$runnerTemp/zxd-web-build'),
+  ).absolute;
+  final thirdParty =
+      Platform.environment['ZXD_THIRD_PARTY'] ??
+      (runnerTemp == null ? '$root/third_party' : '$runnerTemp/third_party');
 
   if (await out.exists()) {
     final others = [
@@ -55,12 +70,14 @@ Future<void> main(List<String> args) async {
   await out.create(recursive: true);
 
   final emsdkEnv = await _emsdkEnvironment(root);
-  Future<void> run(List<String> command) =>
-      _run(command, workingDirectory: root, emsdkEnv: emsdkEnv);
+  Future<void> run(List<String> command, [Map<String, String>? env]) => _run(
+    command,
+    workingDirectory: root,
+    emsdkEnv: emsdkEnv,
+    environment: env,
+  );
 
-  await run(['bash', 'tool/fetch_zxing.sh']);
-  final thirdParty =
-      Platform.environment['ZXD_THIRD_PARTY'] ?? '$root/third_party';
+  await run(['bash', 'tool/fetch_zxing.sh'], {'ZXD_THIRD_PARTY': thirdParty});
 
   // Exception catching is required: zxing-cpp uses exceptions for malformed
   // and unencodable inputs, and the C ABI promises that none cross it.
@@ -114,6 +131,26 @@ Future<void> main(List<String> args) async {
     '${out.path}/${_outputs.first}',
   ]);
 
+  if (options['toolchain-file'] case final path?) {
+    final version = await Process.run('bash', [
+      '-c',
+      emsdkEnv == null
+          ? 'emcc --version'
+          : 'source "\$0" > /dev/null && emcc --version',
+      ?emsdkEnv,
+    ]);
+    // "emcc (Emscripten gcc/clang-like replacement + linker emulating GNU
+    // ld) 5.0.0 (...)" is "Emscripten 5.0.0 (...)".
+    final line = '${version.stdout}'
+        .split('\n')
+        .first
+        .replaceFirst(RegExp(r'^emcc \(.*?\) '), 'Emscripten ');
+    if (version.exitCode != 0 || !line.startsWith('Emscripten ')) {
+      _fail('emcc --version: ${version.stdout}${version.stderr}');
+    }
+    await File(path).writeAsString('$line\n');
+  }
+
   stdout.writeln('Built:');
   for (final name in _outputs) {
     final file = File('${out.path}/$name');
@@ -134,6 +171,7 @@ Map<String, String> _parse(List<String> args) {
     final name = switch (arg) {
       '--out' => 'out',
       '--work' => 'work',
+      '--toolchain-file' => 'toolchain-file',
       _ => _fail('Unknown argument: $arg\n$_usage'),
     };
     if (i + 1 == args.length) _fail('$arg needs a value.\n$_usage');
@@ -160,6 +198,7 @@ Future<void> _run(
   List<String> command, {
   required String workingDirectory,
   required String? emsdkEnv,
+  Map<String, String>? environment,
 }) async {
   stdout.writeln('+ ${command.join(' ')}');
   final process = await Process.start(
@@ -173,7 +212,7 @@ Future<void> _run(
             ...command,
           ],
     workingDirectory: workingDirectory,
-    environment: {if (emsdkEnv != null) 'EMSDK_QUIET': '1'},
+    environment: {if (emsdkEnv != null) 'EMSDK_QUIET': '1', ...?environment},
     mode: ProcessStartMode.inheritStdio,
   );
   final code = await process.exitCode;

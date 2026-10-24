@@ -12,8 +12,8 @@ import 'backend.dart';
 const _abiVersion = 3;
 
 /// Where the zxing_dart build hook installs the worker in a Flutter web app
-/// (native_prebuilt ADR 002 D1, D8).
-const defaultWorkerUrl = 'native_prebuilt/zxing_dart/zxing_dart_worker.mjs';
+/// (kiln ADR 002 D1, D8).
+const defaultWorkerUrl = 'kiln/zxing_dart/zxing_dart_worker.mjs';
 
 /// [workerUri] resolved against [baseUri], with the query
 /// `v=<webRuntimeVersion>` unless it has a `v` query already (ADR 002 D7).
@@ -458,7 +458,7 @@ final class _WebWorkerBackend implements ZxingBackend {
       'zxing_dart Worker failed to load from $_workerUrl'
       '${detail == null || detail.isEmpty ? '' : ': $detail'}. In a Flutter '
       'web app, the zxing_dart build hook installs it in '
-      'web/native_prebuilt/zxing_dart/. Other embedders must serve those '
+      'web/kiln/zxing_dart/. Other embedders must serve those '
       'files and set ZxingDartWeb.workerUri.',
     );
     final wasIdle = _pending.isEmpty;
