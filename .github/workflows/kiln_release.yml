@@ -37,7 +37,7 @@ permissions:
 
 jobs:
   kiln-release:
-    uses: Telosnex/telosnex_ci_tools/.github/workflows/kiln_release.yml@e0e28658fb38fc4b4ec5e9b61617505eba3ddc21 # main
+    uses: Telosnex/telosnex_ci_tools/.github/workflows/kiln_release.yml@25cbd3cfd9d84679a14d7ba323785fcccebea9fe # v0.2.0
     permissions:
       contents: write
     with:
@@ -48,7 +48,7 @@ jobs:
         "macos-arm64", "macos-x64", "ios-arm64-iphoneos",
         "ios-arm64-iphonesimulator", "ios-x64-iphonesimulator",
         "android-arm", "android-arm64", "android-x64"]
-      containers: >-
+      runners: >-
         {"linux-x64": {"runner": "ubuntu-22.04",
           "image": "gcc@sha256:5c3421e670da08036f641a073da0191f82334ba6f102558dd2d73ded72318d2b"},
         "linux-arm64": {"runner": "ubuntu-24.04-arm",
