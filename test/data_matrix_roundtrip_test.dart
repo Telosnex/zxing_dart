@@ -27,7 +27,8 @@ void main() {
         for (var px = 0; px < side; px++) {
           final mx = px ~/ scale - quietZone;
           final my = py ~/ scale - quietZone;
-          final dark = mx >= 0 &&
+          final dark =
+              mx >= 0 &&
               my >= 0 &&
               mx < matrix.width &&
               my < matrix.height &&
