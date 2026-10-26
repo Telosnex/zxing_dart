@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
       - run: dart pub get
       - run: dart test -r expanded
 
@@ -60,14 +60,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
       - run: dart pub get
       - run: dart run kiln:web install-dev
-      - name: dart test -p ${{ matrix.platform }} -c ${{ matrix.compiler }}
-        env:
-          PLATFORM: ${{ matrix.platform }}
-          COMPILER: ${{ matrix.compiler }}
-        run: dart test -p "$PLATFORM" -c "$COMPILER" -j 1 -r expanded
+      - uses: Telosnex/telosnex_ci_tools/actions/dart-test-browser@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
+        with:
+          platform: ${{ matrix.platform }}
+          compiler: ${{ matrix.compiler }}
+          args: -j 1
 
   ios:
     name: iOS ARM64 simulator
@@ -77,9 +77,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
       - run: dart pub get
-      - uses: Telosnex/telosnex_ci_tools/actions/ios-simulator-boot@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/ios-simulator-boot@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
+      - run: dart run tool/prebuilt_artifacts.dart ios-arm64-iphonesimulator
       - run: tool/test_ios_simulator.sh
 
   android:
@@ -90,9 +91,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/setup-flutter@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
       - run: dart pub get
-      - uses: Telosnex/telosnex_ci_tools/actions/android-emulator@8e94d6a140db5300d9e5329bc8c2e4dc30154a08 # main
+      - uses: Telosnex/telosnex_ci_tools/actions/android-emulator@81f9d8a288f7172d3767a2dfa1b6f57fa8a2689b # main
         with:
           api-level: '36'
+      - run: dart run tool/prebuilt_artifacts.dart android-x64
       - run: tool/test_android_device.sh
