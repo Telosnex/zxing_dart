@@ -1,4 +1,4 @@
-## 0.1.0-dev
+## 0.1.0
 
 - Add a stable seven-call C ABI over pinned zxing-cpp.
 - Add asynchronous Aztec/Data Matrix encode and barcode decode APIs with a
