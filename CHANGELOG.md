@@ -1,3 +1,8 @@
+## 0.1.1
+
+- Excludes build and platform folders from analysis, as Flutter 3.47 does.
+  No code changes.
+
 ## 0.1.0
 
 - Add a stable seven-call C ABI over pinned zxing-cpp.

@@ -2,7 +2,7 @@ name: zxing_dart
 description: >-
   Barcode encode and decode with zxing-cpp: native through FFI, web through
   a WebAssembly worker. Bytes in, bytes out.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/Telosnex/zxing_dart
 issue_tracker: https://github.com/Telosnex/zxing_dart/issues
 
