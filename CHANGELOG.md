@@ -1,3 +1,7 @@
+## 1.0.0
+
+- First stable release. Requires kiln 1.0.0, whose source key leaves out the pubspec's `version` and `description`, so a release that changes only those needs no new native build.
+
 ## 0.1.3
 
 - A usage example: encode an Aztec symbol and read it back.
