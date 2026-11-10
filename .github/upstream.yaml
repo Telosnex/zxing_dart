@@ -2,6 +2,6 @@
 # (telosnex_ci_tools, lib/src/upstream.dart). Set `seen` to skip an update.
 # zint comes with zxing-cpp (its submodule).
 sources:
-  - name: zxing-cpp
+  - name: zxing-cpp/zxing-cpp
     tags: https://github.com/zxing-cpp/zxing-cpp.git
     pin: {file: tool/fetch_zxing.sh, pattern: 'PIN_COMMIT="([0-9a-f]{40})"'}
