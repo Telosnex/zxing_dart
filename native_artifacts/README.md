@@ -15,7 +15,7 @@ Actions artifacts but do not create releases or push a manifest branch.
 
 ## Sources and runtime requirements
 
-- zxing-cpp v3.1.1: `287c85df6f961c8efbfb5ffd736cd9457b8b890e`
+- zxing-cpp v3.2.0: `f66b8ab4909e2ce33a1dc68add372e8d2ef99007`
 - zint v2.16.0: `55541e139e62b9209b71cd9b0ba9010cec28b1d9`
 - ABI 3, native profile 5, exactly seven `zxd_*` exports
 - Web: Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)

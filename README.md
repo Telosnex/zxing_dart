@@ -55,7 +55,7 @@ Documented in `src/zxing_dart.h`; highlights:
 
 | Component | Version | License | Pin |
 |---|---|---|---|
-| zxing-cpp | v3.1.1 | Apache-2.0 | `287c85df6f961c8efbfb5ffd736cd9457b8b890e` |
+| zxing-cpp | v3.2.0 | Apache-2.0 | `f66b8ab4909e2ce33a1dc68add372e8d2ef99007` |
 | zint writer | v2.16.0 | BSD-3-Clause | `55541e139e62b9209b71cd9b0ba9010cec28b1d9` |
 | dart_alloc.h | flutter_zxing 2.3.0 | MIT | adapted, attributed in-file |
 | `barcode` test oracle | 2.2.9 | Apache-2.0 | exact dev-dependency pin |

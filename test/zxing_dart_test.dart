@@ -23,7 +23,7 @@ void main() {
     expect(identical(first, second), isTrue);
     expect(first.runtime, expectedRuntime);
     expect(first.abiVersion, 3);
-    expect(first.buildInfo, 'zxing_dart ABI 3; zxing-cpp 3.1.1; zint 2.16.0');
+    expect(first.buildInfo, 'zxing_dart ABI 3; zxing-cpp 3.2.0; zint 2.16.0');
     expect(first.canReadBarcodes, isTrue);
     expect(first.canEncodeAztec, isTrue);
     expect(first.canEncodeDataMatrix, isTrue);
@@ -35,7 +35,7 @@ void main() {
     expect((matrix.width, matrix.height), (41, 41));
     expect(matrix.rowStride, 6);
     expect(matrix.bits.length, matrix.rowStride * matrix.height);
-    // Pin the public renderer output of zxing-cpp 3.1.1 + zint 2.16.0.
+    // Pin the public renderer output of zxing-cpp 3.2.0 + zint 2.16.0.
     expect(
       sha256.convert(matrix.bits).toString(),
       '19a061412d2dba9d524030cfb3077eb5d48da09d4956b4cb739d51c670b6d70c',

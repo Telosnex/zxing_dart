@@ -43,7 +43,7 @@ if [[ -z "${ZXD_ZXING_SOURCE:-}" && "${ZXD_SKIP_FETCH:-0}" != 1 ]]; then
   bash "$root/tool/fetch_zxing.sh"
 fi
 zxing_source="${ZXD_ZXING_SOURCE:-${ZXD_THIRD_PARTY:-$root/third_party}/zxing-cpp}"
-[[ "$(git -C "$zxing_source" rev-parse HEAD)" == 287c85df6f961c8efbfb5ffd736cd9457b8b890e ]]
+[[ "$(git -C "$zxing_source" rev-parse HEAD)" == f66b8ab4909e2ce33a1dc68add372e8d2ef99007 ]]
 [[ "$(git -C "$zxing_source/zint" rev-parse HEAD)" == 55541e139e62b9209b71cd9b0ba9010cec28b1d9 ]]
 macos_version="${ZXD_MACOS_VERSION:-12.0}"
 ios_version="${ZXD_IOS_VERSION:-13.0}"
@@ -387,7 +387,7 @@ if ! diff -u "$expected_exports" "$build_dir/actual_exports.txt"; then
   exit 1
 fi
 
-strings "$artifact" | grep 'zxing_dart ABI 3; zxing-cpp 3.1.1; zint 2.16.0' >/dev/null || {
+strings "$artifact" | grep 'zxing_dart ABI 3; zxing-cpp 3.2.0; zint 2.16.0' >/dev/null || {
   echo 'Artifact build-info string is missing or unexpected.' >&2
   exit 1
 }

@@ -312,7 +312,7 @@ void testMalformedFrameFuzz()
 int main()
 {
     CHECK(zxd_abi_version() == ZXD_ABI_VERSION);
-    CHECK(std::strstr(zxd_build_info(), "zxing-cpp 3.1.1") != nullptr);
+    CHECK(std::strstr(zxd_build_info(), "zxing-cpp 3.2.0") != nullptr);
 
     // Representative pairing envelope: "tnx2:" + base64url(82-byte payload).
     testRoundTrip(

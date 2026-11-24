@@ -16,7 +16,7 @@ Future<void> main() async {
   if (manifest['profile'] != 5 ||
       sources is! Map<String, Object?> ||
       sources.length != 2 ||
-      sources['zxing-cpp'] != '287c85df6f961c8efbfb5ffd736cd9457b8b890e' ||
+      sources['zxing-cpp'] != 'f66b8ab4909e2ce33a1dc68add372e8d2ef99007' ||
       sources['zint'] != '55541e139e62b9209b71cd9b0ba9010cec28b1d9') {
     throw const FormatException('Unexpected production source/build profile');
   }

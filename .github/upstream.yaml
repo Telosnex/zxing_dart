@@ -1,6 +1,7 @@
 # Upstream sources, checked daily by the Upstream watch workflow
 # (telosnex_ci_tools, lib/src/upstream.dart). Set `seen` to skip an update.
-# zint comes with zxing-cpp (its submodule).
+# The watch reads the zxing-cpp v3.2.0 commit from the fetch script.
+# zxing-cpp includes zint as a submodule.
 sources:
   - name: zxing-cpp/zxing-cpp
     tags: https://github.com/zxing-cpp/zxing-cpp.git
