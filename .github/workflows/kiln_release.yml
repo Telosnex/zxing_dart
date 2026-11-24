@@ -9,8 +9,9 @@
 #   build_web.dart   Builds zxing-cpp and the shim with Emscripten.
 #   test_web.dart    The Chrome tests, with dart2js and dart2wasm.
 #
-# Linux builds use pinned GCC 12 / Debian 11 (glibc 2.31) images on runners
-# of their architecture. Windows uses pinned Debian 12 with MinGW GCC 12
+# Linux libraries use GCC 12 in pinned Debian 11 images (glibc 2.31). The
+# Linux ARM64 runner runs Flutter on the host and GCC in the image. Windows
+# uses pinned Debian 12 with MinGW GCC 12
 # POSIX (x64) or SHA-256-pinned llvm-mingw (arm64). The web files build in
 # the pinned emscripten/emsdk:5.0.0 image.
 #
@@ -51,8 +52,7 @@ jobs:
       runners: >-
         {"linux-x64": {"runner": "ubuntu-22.04",
           "image": "gcc@sha256:5c3421e670da08036f641a073da0191f82334ba6f102558dd2d73ded72318d2b"},
-        "linux-arm64": {"runner": "ubuntu-24.04-arm",
-          "image": "gcc@sha256:877cfec017e7d18ddaf3376a2a575bd9c065ee34e6c20b8913938360992a0040"},
+        "linux-arm64": {"runner": "ubuntu-24.04-arm"},
         "windows-x64": {"runner": "ubuntu-22.04",
           "image": "debian@sha256:362e64223cc0da95422b3b13c045186fc0a81250e765d31c025fbddf257f6143"},
         "windows-arm64": {"runner": "ubuntu-22.04",

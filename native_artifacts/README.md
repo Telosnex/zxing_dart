@@ -26,7 +26,7 @@ Actions artifacts but do not create releases or push a manifest branch.
 | iOS arm64 device | iOS 13 | macos-15, Xcode |
 | iOS arm64 / x64 simulator | iOS 14 / 13 | macos-15, Xcode |
 | Android arm / arm64 / x64 | API 24, 16KB alignment | NDK 28.2.13676358 |
-| Linux arm64 / x64 | glibc 2.31 | native-architecture Actions runner, pinned GCC 12.3 bullseye image |
+| Linux arm64 / x64 | glibc 2.31 | pinned GCC 12.3 bullseye image (ARM64 runs Flutter on the host) |
 | Windows x64 | Win32 | pinned Debian 12, MinGW-w64 GCC 12 POSIX |
 | Windows arm64 | Windows 10 UCRT | pinned Debian 12, SHA-256-pinned llvm-mingw 20260922 |
 

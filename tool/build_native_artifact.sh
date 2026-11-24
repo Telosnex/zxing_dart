@@ -39,6 +39,10 @@ case "$target" in
   *) usage ;;
 esac
 
+if [[ "$target" == linux-arm64 && "${ZXD_LINUX_ARM64_DOCKER:-0}" == 1 ]]; then
+  exec bash "$root/tool/build_native_linux_docker.sh" "$target"
+fi
+
 if [[ -z "${ZXD_ZXING_SOURCE:-}" && "${ZXD_SKIP_FETCH:-0}" != 1 ]]; then
   bash "$root/tool/fetch_zxing.sh"
 fi

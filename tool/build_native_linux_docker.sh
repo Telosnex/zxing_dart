@@ -20,6 +20,31 @@ else
   image='gcc@sha256:877cfec017e7d18ddaf3376a2a575bd9c065ee34e6c20b8913938360992a0040'
 fi
 
+# Kiln supplies a pinned checkout and a path for the library. Mount only the
+# sources. Stream the built library to the host to keep host file ownership.
+if [[ -n "${ZXD_ZXING_SOURCE:-}" ]]; then
+  output="${ZXD_OUTPUT:?Set ZXD_OUTPUT for the library}"
+  mkdir -p "$(dirname "$output")"
+  temp="$(mktemp "${output}.XXXXXX")"
+  trap 'rm -f "$temp"' EXIT
+  docker run --rm --platform "$platform" \
+    -v "$root:/workspace:ro" \
+    -v "${ZXD_ZXING_SOURCE%/}:/zxing-cpp:ro" \
+    -w /workspace "$image" bash -c '
+      set -euo pipefail
+      git config --global --add safe.directory /zxing-cpp
+      git config --global --add safe.directory /zxing-cpp/zint
+      bash tool/install_build_toolchain.sh "$1" >&2
+      ZXD_ZXING_SOURCE=/zxing-cpp ZXD_BUILD_JOBS="$2" \
+        ZXD_BUILD_ROOT=/tmp/zxd-build ZXD_OUTPUT=/tmp/libzxing_dart.so \
+        bash tool/build_native_artifact.sh "$1" >&2
+      cat /tmp/libzxing_dart.so
+    ' bash "$target" "${ZXD_BUILD_JOBS:-4}" > "$temp"
+  chmod 755 "$temp"
+  mv -f "$temp" "$output"
+  exit
+fi
+
 docker run --rm --platform "$platform" \
   -v "$root:/workspace" \
   -w /workspace \
