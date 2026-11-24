@@ -15,7 +15,7 @@ Actions artifacts but do not create releases or push a manifest branch.
 
 ## Sources and runtime requirements
 
-- zxing-cpp v3.1.1: `287c85df6f961c8efbfb5ffd736cd9457b8b890e`
+- zxing-cpp v3.2.0: `f66b8ab4909e2ce33a1dc68add372e8d2ef99007`
 - zint v2.16.0: `55541e139e62b9209b71cd9b0ba9010cec28b1d9`
 - ABI 3, native profile 5, exactly seven `zxd_*` exports
 - Web: Emscripten 5.0.0 (`a7c5deabd7c88ba1c38ebe988112256775f944c6`)
@@ -26,7 +26,7 @@ Actions artifacts but do not create releases or push a manifest branch.
 | iOS arm64 device | iOS 13 | macos-15, Xcode |
 | iOS arm64 / x64 simulator | iOS 14 / 13 | macos-15, Xcode |
 | Android arm / arm64 / x64 | API 24, 16KB alignment | NDK 28.2.13676358 |
-| Linux arm64 / x64 | glibc 2.31 | native-architecture Actions runner, pinned GCC 12.3 bullseye image |
+| Linux arm64 / x64 | glibc 2.31 | pinned GCC 12.3 bullseye image (ARM64 runs Flutter on the host) |
 | Windows x64 | Win32 | pinned Debian 12, MinGW-w64 GCC 12 POSIX |
 | Windows arm64 | Windows 10 UCRT | pinned Debian 12, SHA-256-pinned llvm-mingw 20260922 |
 

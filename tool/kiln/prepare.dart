@@ -1,7 +1,7 @@
-/// Runs before each native build of the kiln release workflow. The Linux and
-/// Windows targets build in pinned Debian containers (see
-/// .github/workflows/kiln_release.yml). This installs their toolchain with
-/// tool/install_build_toolchain.sh and describes it in KILN_TOOLCHAIN.
+/// Runs before each native build of the Kiln release workflow. Linux and
+/// Windows libraries use pinned Debian containers. This configures the Linux
+/// ARM64 Docker build or installs the toolchain in the workflow container.
+/// KILN_TOOLCHAIN describes the compiler.
 ///
 /// The workflow runs a copy of this file outside the package, so it imports
 /// only dart: libraries.
@@ -13,6 +13,17 @@ Future<void> main() async {
   final env = Platform.environment;
   final target = env['TARGET']!;
   if (!target.startsWith('linux-') && !target.startsWith('windows-')) return;
+
+  if (target == 'linux-arm64') {
+    // The ARM64 Dart SDK needs a newer glibc than the GCC container provides.
+    await _run('docker', ['--version']);
+    _append(env['GITHUB_ENV']!, 'ZXD_LINUX_ARM64_DOCKER=1');
+    _append(
+      env['GITHUB_ENV']!,
+      'KILN_TOOLCHAIN=Debian 11 container, GCC 12.3.0',
+    );
+    return;
+  }
 
   final root = env['GITHUB_WORKSPACE']!;
   final script = '$root/tool/install_build_toolchain.sh';

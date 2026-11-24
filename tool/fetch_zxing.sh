@@ -6,9 +6,9 @@
 # a full conformance run.
 set -euo pipefail
 
-# v3.1.1. Keep the immutable commit rather than trusting a movable tag during
+# v3.2.0. Keep the immutable commit rather than trusting a movable tag during
 # production rebuilds. Upgrades require the full synthetic + native matrix.
-readonly PIN_COMMIT="287c85df6f961c8efbfb5ffd736cd9457b8b890e"
+readonly PIN_COMMIT="f66b8ab4909e2ce33a1dc68add372e8d2ef99007"
 readonly REPO_URL="https://github.com/zxing-cpp/zxing-cpp.git"
 readonly ZINT_PIN_COMMIT="55541e139e62b9209b71cd9b0ba9010cec28b1d9"
 
@@ -39,8 +39,7 @@ if [[ "${actual}" != "${PIN_COMMIT}" ]]; then
   exit 1
 fi
 
-# 3.1.1's production writer is the pinned zint submodule. Verify its immutable
-# revision independently instead of trusting recursive checkout state.
+# The production writer uses the zint submodule. Check its commit separately.
 git -C "${DEST}" submodule update --init --depth 1 zint
 zint_actual="$(git -C "${DEST}/zint" rev-parse HEAD)"
 if [[ "${zint_actual}" != "${ZINT_PIN_COMMIT}" ]]; then

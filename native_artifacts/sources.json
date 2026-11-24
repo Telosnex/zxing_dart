@@ -4,7 +4,7 @@
     {
       "name": "zxing-cpp",
       "git": "https://github.com/zxing-cpp/zxing-cpp.git",
-      "commit": "287c85df6f961c8efbfb5ffd736cd9457b8b890e",
+      "commit": "f66b8ab4909e2ce33a1dc68add372e8d2ef99007",
       "submodules": true
     }
   ]

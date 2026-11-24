@@ -38,6 +38,7 @@ void main() {
         'src/zxing_dart.cpp',
         'src/exports_windows.def',
         'tool/build_native_artifact.sh',
+        'tool/build_native_linux_docker.sh',
         'tool/kiln/build_web.dart',
         'tool/fetch_zxing.sh',
         'tool/install_build_toolchain.sh',

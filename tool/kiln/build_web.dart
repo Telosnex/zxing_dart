@@ -124,6 +124,8 @@ Future<void> main(List<String> args) async {
     '-sEXPORT_ES6=1',
     '-sENVIRONMENT=web,worker,node',
     '-sALLOW_MEMORY_GROWTH=1',
+    // The zint Aztec encoder needs more than the default 64 KiB stack.
+    '-sSTACK_SIZE=262144',
     '-sFILESYSTEM=0',
     '-sEXPORTED_FUNCTIONS=${_exportedFunctions.join(',')}',
     '-sEXPORTED_RUNTIME_METHODS=UTF8ToString,HEAPU8',

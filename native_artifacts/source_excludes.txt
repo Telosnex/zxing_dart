@@ -24,7 +24,6 @@ native_artifacts/windows-arm64/
 native_artifacts/windows-x64/
 tool/build_all_native.sh
 tool/build_macos.sh
-tool/build_native_linux_docker.sh
 tool/build_native_windows_docker.sh
 tool/render_synthetic_case.dart
 tool/safari_test_launcher.sh
